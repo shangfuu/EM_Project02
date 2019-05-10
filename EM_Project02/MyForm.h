@@ -2,7 +2,6 @@
 #include "DataManager.h"
 #include "DotNetUtilities.h"
 
-
 namespace Optimization {
 
 	using namespace System;
