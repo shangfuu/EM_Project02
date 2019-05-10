@@ -53,7 +53,7 @@ namespace Optimization {
 
 	protected:
 		/// <summary>
-		DataManager* dataManager;
+		DataManager * dataManager;
 		/// 清除任何使用中的資源。
 		/// </summary>
 		~MyForm()
@@ -321,59 +321,59 @@ namespace Optimization {
 	private: System::Void loadEquationsToolStripMenuItem_Click(System::Object^  sender, System::EventArgs^  e) {
 		openFileDialog1->ShowDialog();
 	}
-private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
-	//在Dialog按下OK便會進入此函式
-	//字串轉制string^ to string
-	std::string tempFileName;
-	MarshalString(openFileDialog1->FileName, tempFileName);
-	//將檔案路徑名稱傳入dataManager
-	dataManager->SetFileName(tempFileName);
-	//從讀取讀取向量資料
-	if (dataManager->LoadEquationData())
-	{
-		std::vector<std::string> equations = dataManager->GetEquations();
-		Output->Multiline = true;
-		for (unsigned int i = 0; i < equations.size(); i++)
+	private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::ComponentModel::CancelEventArgs^  e) {
+		//在Dialog按下OK便會進入此函式
+		//字串轉制string^ to string
+		std::string tempFileName;
+		MarshalString(openFileDialog1->FileName, tempFileName);
+		//將檔案路徑名稱傳入dataManager
+		dataManager->SetFileName(tempFileName);
+		//從讀取讀取向量資料
+		if (dataManager->LoadEquationData())
 		{
-			Output->Text += gcnew String(equations[i].c_str());
-			Output->Text += Environment::NewLine;
+			std::vector<std::string> equations = dataManager->GetEquations();
+			Output->Multiline = true;
+			for (unsigned int i = 0; i < equations.size(); i++)
+			{
+				Output->Text += gcnew String(equations[i].c_str());
+				Output->Text += Environment::NewLine;
+			}
 		}
 	}
-}
-private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-	Input->Text->Length;
-	Output->Text->Length;
-}
-		 private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+		Input->Text->Length;
+		Output->Text->Length;
+	}
+	private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 
-			 if (radioButton1->Checked) {
-				 Output->Text += radioButton1->Name + Environment::NewLine;
-				 Method = enPowells;
-			 }
-		 }
-private: System::Void Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	if (radioButton3->Checked) {
-		Output->Text += radioButton3->Name + Environment::NewLine;
-		Method = enSteep_Descent;
+		if (radioButton1->Checked) {
+			Output->Text += radioButton1->Name + Environment::NewLine;
+			Method = enPowells;
+		}
 	}
-}
-private: System::Void Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	if (radioButton5->Checked) {
-		Output->Text += radioButton5->Name + Environment::NewLine;
-		Method = enConjugate_Gradient;
+	private: System::Void Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+		if (radioButton3->Checked) {
+			Output->Text += radioButton3->Name + Environment::NewLine;
+			Method = enSteep_Descent;
+		}
 	}
-}
-private: System::Void Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	if (radioButton2->Checked) {
-		Output->Text += radioButton2->Name + Environment::NewLine;
-		Method = enNewton;
+	private: System::Void Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+		if (radioButton5->Checked) {
+			Output->Text += radioButton5->Name + Environment::NewLine;
+			Method = enConjugate_Gradient;
+		}
 	}
-}
-private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	if (radioButton4->Checked) {
-		Output->Text += radioButton4->Name + Environment::NewLine;
-		Method = enQuasi_Newton;
+	private: System::Void Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+		if (radioButton2->Checked) {
+			Output->Text += radioButton2->Name + Environment::NewLine;
+			Method = enNewton;
+		}
 	}
-}
-};
+	private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+		if (radioButton4->Checked) {
+			Output->Text += radioButton4->Name + Environment::NewLine;
+			Method = enQuasi_Newton;
+		}
+	}
+	};
 }
