@@ -2,7 +2,8 @@
 #include "DataManager.h"
 #include "DotNetUtilities.h"
 
-namespace EM_Project02 {
+
+namespace Optimization {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -11,13 +12,15 @@ namespace EM_Project02 {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
-	enum METHOD{enPowells = 0,
+	enum METHOD {
+		enPowells = 0,
 		enNewton,
 		enSteep_Descent,
 		enQuasi_Newton,
 		enConjugate_Gradient
 	}Method;
-	
+
+
 	/// <summary>
 	/// MyForm 的摘要
 	/// </summary>
@@ -32,13 +35,8 @@ namespace EM_Project02 {
 			//TODO:  在此加入建構函式程式碼
 			//
 		}
-	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel1;
-	public:
-	private: System::Windows::Forms::Label^  InputText;
-	private: System::Windows::Forms::TextBox^  Input;
-	private: System::Windows::Forms::Label^  OutputText;
-	private: System::Windows::Forms::TextBox^  Output;
 	private: System::Windows::Forms::MenuStrip^  menuStrip1;
+	public:
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadEquationsToolStripMenuItem;
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel2;
@@ -49,13 +47,7 @@ namespace EM_Project02 {
 	private: System::Windows::Forms::RadioButton^  radioButton2;
 	private: System::Windows::Forms::RadioButton^  radioButton1;
 
-
-
-
-
 	public:
-
-
 
 
 
@@ -73,11 +65,11 @@ namespace EM_Project02 {
 		}
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
 	protected:
-
-
-
-
-
+	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel1;
+	private: System::Windows::Forms::Label^  InputText;
+	private: System::Windows::Forms::TextBox^  Input;
+	private: System::Windows::Forms::Label^  OutputText;
+	private: System::Windows::Forms::TextBox^  Output;
 
 
 
@@ -110,9 +102,9 @@ namespace EM_Project02 {
 			this->OutputText = (gcnew System::Windows::Forms::Label());
 			this->Output = (gcnew System::Windows::Forms::TextBox());
 			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->loadEquationsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
 			this->tableLayoutPanel1->SuspendLayout();
 			this->flowLayoutPanel1->SuspendLayout();
 			this->groupBox1->SuspendLayout();
@@ -276,6 +268,16 @@ namespace EM_Project02 {
 			this->openFileDialog1->FileName = L"openFileDialog1";
 			this->openFileDialog1->FileOk += gcnew System::ComponentModel::CancelEventHandler(this, &MyForm::openFileDialog1_FileOk);
 			// 
+			// menuStrip1
+			// 
+			this->menuStrip1->ImageScalingSize = System::Drawing::Size(20, 20);
+			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->fileToolStripMenuItem });
+			this->menuStrip1->Location = System::Drawing::Point(0, 0);
+			this->menuStrip1->Name = L"menuStrip1";
+			this->menuStrip1->Size = System::Drawing::Size(1322, 27);
+			this->menuStrip1->TabIndex = 1;
+			this->menuStrip1->Text = L"menuStrip1";
+			// 
 			// fileToolStripMenuItem
 			// 
 			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->loadEquationsToolStripMenuItem });
@@ -289,16 +291,6 @@ namespace EM_Project02 {
 			this->loadEquationsToolStripMenuItem->Size = System::Drawing::Size(192, 26);
 			this->loadEquationsToolStripMenuItem->Text = L"Load Equations";
 			this->loadEquationsToolStripMenuItem->Click += gcnew System::EventHandler(this, &MyForm::loadEquationsToolStripMenuItem_Click);
-			// 
-			// menuStrip1
-			// 
-			this->menuStrip1->ImageScalingSize = System::Drawing::Size(20, 20);
-			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->fileToolStripMenuItem });
-			this->menuStrip1->Location = System::Drawing::Point(0, 0);
-			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(1322, 27);
-			this->menuStrip1->TabIndex = 1;
-			this->menuStrip1->Text = L"menuStrip1";
 			// 
 			// MyForm
 			// 
@@ -348,13 +340,17 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 		}
 	}
 }
-private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-	
-	if (radioButton1->Checked) {
-		Output->Text += radioButton1->Name + Environment::NewLine;
-		Method = enPowells;
-	}
+private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+	Input->Text->Length;
+	Output->Text->Length;
 }
+		 private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+
+			 if (radioButton1->Checked) {
+				 Output->Text += radioButton1->Name + Environment::NewLine;
+				 Method = enPowells;
+			 }
+		 }
 private: System::Void Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 	if (radioButton3->Checked) {
 		Output->Text += radioButton3->Name + Environment::NewLine;
@@ -378,10 +374,6 @@ private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::Even
 		Output->Text += radioButton4->Name + Environment::NewLine;
 		Method = enQuasi_Newton;
 	}
-}
-private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-	Output->Text += Input->Text;
-
 }
 };
 }

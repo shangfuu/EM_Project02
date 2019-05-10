@@ -7,6 +7,6 @@ int main(array<String^>^ argv)
 {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
-	EM_Project02::MyForm windowsForm;
+	Optimization::MyForm windowsForm;
 	Application::Run(%windowsForm);
 }
