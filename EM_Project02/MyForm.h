@@ -11,6 +11,13 @@ namespace Optimization {
 	using namespace System::Data;
 	using namespace System::Drawing;
 
+	enum METHOD{enPowells = 0,
+		enNewton,
+		enSteep_Descent,
+		enQuasi_Newton,
+		enConjugate_Gradient
+	}Method;
+	
 	/// <summary>
 	/// MyForm ªººK­n
 	/// </summary>
@@ -35,6 +42,13 @@ namespace Optimization {
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadEquationsToolStripMenuItem;
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel2;
+	private: System::Windows::Forms::GroupBox^  groupBox1;
+	private: System::Windows::Forms::RadioButton^  radioButton5;
+	private: System::Windows::Forms::RadioButton^  radioButton4;
+	private: System::Windows::Forms::RadioButton^  radioButton3;
+	private: System::Windows::Forms::RadioButton^  radioButton2;
+	private: System::Windows::Forms::RadioButton^  radioButton1;
+
 
 
 
@@ -86,15 +100,23 @@ namespace Optimization {
 			this->flowLayoutPanel1 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->InputText = (gcnew System::Windows::Forms::Label());
 			this->Input = (gcnew System::Windows::Forms::TextBox());
+			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->radioButton5 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton4 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton3 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton2 = (gcnew System::Windows::Forms::RadioButton());
+			this->radioButton1 = (gcnew System::Windows::Forms::RadioButton());
+			this->flowLayoutPanel2 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->OutputText = (gcnew System::Windows::Forms::Label());
 			this->Output = (gcnew System::Windows::Forms::TextBox());
 			this->openFileDialog1 = (gcnew System::Windows::Forms::OpenFileDialog());
 			this->fileToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->loadEquationsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
-			this->flowLayoutPanel2 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->tableLayoutPanel1->SuspendLayout();
 			this->flowLayoutPanel1->SuspendLayout();
+			this->groupBox1->SuspendLayout();
+			this->flowLayoutPanel2->SuspendLayout();
 			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
 			// 
@@ -108,23 +130,22 @@ namespace Optimization {
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel1, 0, 0);
 			this->tableLayoutPanel1->Controls->Add(this->flowLayoutPanel2, 1, 0);
 			this->tableLayoutPanel1->Dock = System::Windows::Forms::DockStyle::Fill;
-			this->tableLayoutPanel1->Location = System::Drawing::Point(0, 24);
+			this->tableLayoutPanel1->Location = System::Drawing::Point(0, 27);
 			this->tableLayoutPanel1->Name = L"tableLayoutPanel1";
 			this->tableLayoutPanel1->RowCount = 1;
 			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Percent, 100)));
-			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 827)));
-			this->tableLayoutPanel1->Size = System::Drawing::Size(1322, 827);
+			this->tableLayoutPanel1->RowStyles->Add((gcnew System::Windows::Forms::RowStyle(System::Windows::Forms::SizeType::Absolute, 800)));
+			this->tableLayoutPanel1->Size = System::Drawing::Size(1322, 800);
 			this->tableLayoutPanel1->TabIndex = 0;
 			// 
 			// flowLayoutPanel1
 			// 
 			this->flowLayoutPanel1->Controls->Add(this->InputText);
 			this->flowLayoutPanel1->Controls->Add(this->Input);
-			this->flowLayoutPanel1->Controls->Add(this->OutputText);
-			this->flowLayoutPanel1->Controls->Add(this->Output);
-			this->flowLayoutPanel1->Location = System::Drawing::Point(4, 4);
+			this->flowLayoutPanel1->Controls->Add(this->groupBox1);
+			this->flowLayoutPanel1->Location = System::Drawing::Point(3, 3);
 			this->flowLayoutPanel1->Name = L"flowLayoutPanel1";
-			this->flowLayoutPanel1->Size = System::Drawing::Size(637, 715);
+			this->flowLayoutPanel1->Size = System::Drawing::Size(655, 794);
 			this->flowLayoutPanel1->TabIndex = 2;
 			// 
 			// InputText
@@ -146,10 +167,93 @@ namespace Optimization {
 			this->Input->Size = System::Drawing::Size(632, 164);
 			this->Input->TabIndex = 1;
 			// 
+			// groupBox1
+			// 
+			this->groupBox1->Controls->Add(this->radioButton5);
+			this->groupBox1->Controls->Add(this->radioButton4);
+			this->groupBox1->Controls->Add(this->radioButton3);
+			this->groupBox1->Controls->Add(this->radioButton2);
+			this->groupBox1->Controls->Add(this->radioButton1);
+			this->groupBox1->Location = System::Drawing::Point(3, 190);
+			this->groupBox1->Name = L"groupBox1";
+			this->groupBox1->Size = System::Drawing::Size(633, 130);
+			this->groupBox1->TabIndex = 2;
+			this->groupBox1->TabStop = false;
+			this->groupBox1->Text = L"Method";
+			// 
+			// radioButton5
+			// 
+			this->radioButton5->AutoSize = true;
+			this->radioButton5->Location = System::Drawing::Point(397, 33);
+			this->radioButton5->Name = L"Conjugate Gradient Method";
+			this->radioButton5->Size = System::Drawing::Size(186, 19);
+			this->radioButton5->TabIndex = 4;
+			this->radioButton5->TabStop = true;
+			this->radioButton5->Text = L"Conjugate Gradient Method";
+			this->radioButton5->UseVisualStyleBackColor = true;
+			this->radioButton5->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Conjugate_CheckedChanged);
+			// 
+			// radioButton4
+			// 
+			this->radioButton4->AutoSize = true;
+			this->radioButton4->Location = System::Drawing::Point(183, 81);
+			this->radioButton4->Name = L"Quasi-Newton Method";
+			this->radioButton4->Size = System::Drawing::Size(157, 19);
+			this->radioButton4->TabIndex = 3;
+			this->radioButton4->TabStop = true;
+			this->radioButton4->Text = L"Quasi-Newton Method";
+			this->radioButton4->UseVisualStyleBackColor = true;
+			this->radioButton4->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Quasi_CheckedChanged);
+			// 
+			// radioButton3
+			// 
+			this->radioButton3->AutoSize = true;
+			this->radioButton3->Location = System::Drawing::Point(183, 33);
+			this->radioButton3->Name = L"Steep Descent Algorithm";
+			this->radioButton3->Size = System::Drawing::Size(170, 19);
+			this->radioButton3->TabIndex = 2;
+			this->radioButton3->TabStop = true;
+			this->radioButton3->Text = L"Steep Descent Algorithm";
+			this->radioButton3->UseVisualStyleBackColor = true;
+			this->radioButton3->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Steep_CheckedChanged);
+			// 
+			// radioButton2
+			// 
+			this->radioButton2->AutoSize = true;
+			this->radioButton2->Location = System::Drawing::Point(15, 81);
+			this->radioButton2->Name = L"Newton\'s Method";
+			this->radioButton2->Size = System::Drawing::Size(128, 19);
+			this->radioButton2->TabIndex = 1;
+			this->radioButton2->TabStop = true;
+			this->radioButton2->Text = L"Newton\'s Method";
+			this->radioButton2->UseVisualStyleBackColor = true;
+			this->radioButton2->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Newton_CheckedChanged);
+			// 
+			// radioButton1
+			// 
+			this->radioButton1->AutoSize = true;
+			this->radioButton1->Location = System::Drawing::Point(15, 33);
+			this->radioButton1->Name = L"Powell\'s Method";
+			this->radioButton1->Size = System::Drawing::Size(123, 19);
+			this->radioButton1->TabIndex = 0;
+			this->radioButton1->TabStop = true;
+			this->radioButton1->Text = L"Powell\'s Method";
+			this->radioButton1->UseVisualStyleBackColor = true;
+			this->radioButton1->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Powell_CheckedChanged);
+			// 
+			// flowLayoutPanel2
+			// 
+			this->flowLayoutPanel2->Controls->Add(this->OutputText);
+			this->flowLayoutPanel2->Controls->Add(this->Output);
+			this->flowLayoutPanel2->Location = System::Drawing::Point(664, 3);
+			this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
+			this->flowLayoutPanel2->Size = System::Drawing::Size(646, 794);
+			this->flowLayoutPanel2->TabIndex = 3;
+			// 
 			// OutputText
 			// 
 			this->OutputText->AutoSize = true;
-			this->OutputText->Location = System::Drawing::Point(4, 187);
+			this->OutputText->Location = System::Drawing::Point(4, 0);
 			this->OutputText->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
 			this->OutputText->Name = L"OutputText";
 			this->OutputText->Size = System::Drawing::Size(46, 15);
@@ -158,11 +262,12 @@ namespace Optimization {
 			// 
 			// Output
 			// 
-			this->Output->Location = System::Drawing::Point(4, 206);
+			this->Output->Location = System::Drawing::Point(4, 19);
 			this->Output->Margin = System::Windows::Forms::Padding(4);
 			this->Output->Multiline = true;
 			this->Output->Name = L"Output";
-			this->Output->Size = System::Drawing::Size(632, 498);
+			this->Output->ReadOnly = true;
+			this->Output->Size = System::Drawing::Size(632, 765);
 			this->Output->TabIndex = 3;
 			// 
 			// openFileDialog1
@@ -174,7 +279,7 @@ namespace Optimization {
 			// 
 			this->fileToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->loadEquationsToolStripMenuItem });
 			this->fileToolStripMenuItem->Name = L"fileToolStripMenuItem";
-			this->fileToolStripMenuItem->Size = System::Drawing::Size(45, 20);
+			this->fileToolStripMenuItem->Size = System::Drawing::Size(45, 23);
 			this->fileToolStripMenuItem->Text = L"File";
 			// 
 			// loadEquationsToolStripMenuItem
@@ -190,16 +295,9 @@ namespace Optimization {
 			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->fileToolStripMenuItem });
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(927, 24);
+			this->menuStrip1->Size = System::Drawing::Size(1322, 27);
 			this->menuStrip1->TabIndex = 1;
 			this->menuStrip1->Text = L"menuStrip1";
-			// 
-			// flowLayoutPanel2
-			// 
-			this->flowLayoutPanel2->TabIndex = 3;
-			this->flowLayoutPanel2->Location = System::Drawing::Point(3, 3);
-			this->flowLayoutPanel2->Name = L"flowLayoutPanel2";
-			this->flowLayoutPanel2->Size = System::Drawing::Size(457, 642);
 			// 
 			// MyForm
 			// 
@@ -214,10 +312,15 @@ namespace Optimization {
 			this->tableLayoutPanel1->ResumeLayout(false);
 			this->flowLayoutPanel1->ResumeLayout(false);
 			this->flowLayoutPanel1->PerformLayout();
+			this->groupBox1->ResumeLayout(false);
+			this->groupBox1->PerformLayout();
+			this->flowLayoutPanel2->ResumeLayout(false);
+			this->flowLayoutPanel2->PerformLayout();
 			this->menuStrip1->ResumeLayout(false);
 			this->menuStrip1->PerformLayout();
 			this->ResumeLayout(false);
 			this->PerformLayout();
+
 		}
 #pragma endregion
 	private: System::Void MyForm_Load(System::Object^  sender, System::EventArgs^  e) {
@@ -242,6 +345,37 @@ private: System::Void openFileDialog1_FileOk(System::Object^  sender, System::Co
 			Output->Text += gcnew String(equations[i].c_str());
 			Output->Text += Environment::NewLine;
 		}
+	}
+}
+private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	
+	if (radioButton1->Checked) {
+		Output->Text += radioButton1->Name + Environment::NewLine;
+		Method = enPowells;
+	}
+}
+private: System::Void Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	if (radioButton3->Checked) {
+		Output->Text += radioButton3->Name + Environment::NewLine;
+		Method = enSteep_Descent;
+	}
+}
+private: System::Void Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	if (radioButton5->Checked) {
+		Output->Text += radioButton5->Name + Environment::NewLine;
+		Method = enConjugate_Gradient;
+	}
+}
+private: System::Void Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	if (radioButton2->Checked) {
+		Output->Text += radioButton2->Name + Environment::NewLine;
+		Method = enNewton;
+	}
+}
+private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	if (radioButton4->Checked) {
+		Output->Text += radioButton4->Name + Environment::NewLine;
+		Method = enQuasi_Newton;
 	}
 }
 };
