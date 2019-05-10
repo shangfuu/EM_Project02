@@ -2,7 +2,7 @@
 #include "DataManager.h"
 #include "DotNetUtilities.h"
 
-namespace Optimization {
+namespace EM_Project02 {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -166,6 +166,7 @@ namespace Optimization {
 			this->Input->Name = L"Input";
 			this->Input->Size = System::Drawing::Size(632, 164);
 			this->Input->TabIndex = 1;
+			this->Input->TextChanged += gcnew System::EventHandler(this, &MyForm::Input_TextChanged);
 			// 
 			// groupBox1
 			// 
@@ -185,7 +186,7 @@ namespace Optimization {
 			// 
 			this->radioButton5->AutoSize = true;
 			this->radioButton5->Location = System::Drawing::Point(397, 33);
-			this->radioButton5->Name = L"Conjugate Gradient Method";
+			this->radioButton5->Name = L"radioButton5";
 			this->radioButton5->Size = System::Drawing::Size(186, 19);
 			this->radioButton5->TabIndex = 4;
 			this->radioButton5->TabStop = true;
@@ -197,7 +198,7 @@ namespace Optimization {
 			// 
 			this->radioButton4->AutoSize = true;
 			this->radioButton4->Location = System::Drawing::Point(183, 81);
-			this->radioButton4->Name = L"Quasi-Newton Method";
+			this->radioButton4->Name = L"radioButton4";
 			this->radioButton4->Size = System::Drawing::Size(157, 19);
 			this->radioButton4->TabIndex = 3;
 			this->radioButton4->TabStop = true;
@@ -209,7 +210,7 @@ namespace Optimization {
 			// 
 			this->radioButton3->AutoSize = true;
 			this->radioButton3->Location = System::Drawing::Point(183, 33);
-			this->radioButton3->Name = L"Steep Descent Algorithm";
+			this->radioButton3->Name = L"radioButton3";
 			this->radioButton3->Size = System::Drawing::Size(170, 19);
 			this->radioButton3->TabIndex = 2;
 			this->radioButton3->TabStop = true;
@@ -221,7 +222,7 @@ namespace Optimization {
 			// 
 			this->radioButton2->AutoSize = true;
 			this->radioButton2->Location = System::Drawing::Point(15, 81);
-			this->radioButton2->Name = L"Newton\'s Method";
+			this->radioButton2->Name = L"radioButton2";
 			this->radioButton2->Size = System::Drawing::Size(128, 19);
 			this->radioButton2->TabIndex = 1;
 			this->radioButton2->TabStop = true;
@@ -233,7 +234,7 @@ namespace Optimization {
 			// 
 			this->radioButton1->AutoSize = true;
 			this->radioButton1->Location = System::Drawing::Point(15, 33);
-			this->radioButton1->Name = L"Powell\'s Method";
+			this->radioButton1->Name = L"radioButton1";
 			this->radioButton1->Size = System::Drawing::Size(123, 19);
 			this->radioButton1->TabIndex = 0;
 			this->radioButton1->TabStop = true;
@@ -377,6 +378,10 @@ private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::Even
 		Output->Text += radioButton4->Name + Environment::NewLine;
 		Method = enQuasi_Newton;
 	}
+}
+private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+	Output->Text += Input->Text;
+
 }
 };
 }
