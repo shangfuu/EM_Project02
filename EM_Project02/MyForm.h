@@ -40,31 +40,33 @@ namespace Optimization {
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadEquationsToolStripMenuItem;
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel2;
+	private: System::Windows::Forms::GroupBox^  groupBox2;
+	private: System::Windows::Forms::Label^  InterYText;
+	private: System::Windows::Forms::Label^  InterXText;
+	private: System::Windows::Forms::Label^  IniYText;
+	private: System::Windows::Forms::Label^  IniXText;
+
+	private: System::Windows::Forms::TextBox^  InterX;
+	private: System::Windows::Forms::TextBox^  IniY;
+	private: System::Windows::Forms::TextBox^  IniX;
 	private: System::Windows::Forms::GroupBox^  groupBox1;
 	private: System::Windows::Forms::RadioButton^  rB_Conjugate;
 	private: System::Windows::Forms::RadioButton^  rB_Quasi;
 	private: System::Windows::Forms::RadioButton^  rB_Steep;
 	private: System::Windows::Forms::RadioButton^  rB_Newton;
 	private: System::Windows::Forms::RadioButton^  rB_Powell;
-	private: System::Windows::Forms::GroupBox^  groupBox2;
-	private: System::Windows::Forms::Label^  InterYText;
-	private: System::Windows::Forms::Label^  InterXText;
-	private: System::Windows::Forms::Label^  IniYText;
-	private: System::Windows::Forms::Label^  IniXText;
-	private: System::Windows::Forms::TextBox^  InterY;
-	private: System::Windows::Forms::TextBox^  InterX;
-	private: System::Windows::Forms::TextBox^  IniY;
-	private: System::Windows::Forms::TextBox^  IniX;
 	private: System::Windows::Forms::Label^  EquationText;
 	private: System::Windows::Forms::TextBox^  EquBox;
+	private: System::Windows::Forms::TextBox^  InterY;
 
 	public:
-
-
 
 	protected:
 		/// <summary>
 		DataManager * dataManager;
+		String^ userInput;
+		String^ UseEquation;
+		int FunctionIndex;
 		/// 清除任何使用中的資源。
 		/// </summary>
 		~MyForm()
@@ -103,12 +105,6 @@ namespace Optimization {
 			this->flowLayoutPanel1 = (gcnew System::Windows::Forms::FlowLayoutPanel());
 			this->InputText = (gcnew System::Windows::Forms::Label());
 			this->Input = (gcnew System::Windows::Forms::TextBox());
-			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
-			this->rB_Conjugate = (gcnew System::Windows::Forms::RadioButton());
-			this->rB_Quasi = (gcnew System::Windows::Forms::RadioButton());
-			this->rB_Steep = (gcnew System::Windows::Forms::RadioButton());
-			this->rB_Newton = (gcnew System::Windows::Forms::RadioButton());
-			this->rB_Powell = (gcnew System::Windows::Forms::RadioButton());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
 			this->InterYText = (gcnew System::Windows::Forms::Label());
 			this->InterXText = (gcnew System::Windows::Forms::Label());
@@ -118,6 +114,12 @@ namespace Optimization {
 			this->InterX = (gcnew System::Windows::Forms::TextBox());
 			this->IniY = (gcnew System::Windows::Forms::TextBox());
 			this->IniX = (gcnew System::Windows::Forms::TextBox());
+			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->rB_Conjugate = (gcnew System::Windows::Forms::RadioButton());
+			this->rB_Quasi = (gcnew System::Windows::Forms::RadioButton());
+			this->rB_Steep = (gcnew System::Windows::Forms::RadioButton());
+			this->rB_Newton = (gcnew System::Windows::Forms::RadioButton());
+			this->rB_Powell = (gcnew System::Windows::Forms::RadioButton());
 			this->EquationText = (gcnew System::Windows::Forms::Label());
 			this->EquBox = (gcnew System::Windows::Forms::TextBox());
 			this->flowLayoutPanel2 = (gcnew System::Windows::Forms::FlowLayoutPanel());
@@ -129,8 +131,8 @@ namespace Optimization {
 			this->loadEquationsToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			this->tableLayoutPanel1->SuspendLayout();
 			this->flowLayoutPanel1->SuspendLayout();
-			this->groupBox1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
+			this->groupBox1->SuspendLayout();
 			this->flowLayoutPanel2->SuspendLayout();
 			this->menuStrip1->SuspendLayout();
 			this->SuspendLayout();
@@ -158,8 +160,8 @@ namespace Optimization {
 			// 
 			this->flowLayoutPanel1->Controls->Add(this->InputText);
 			this->flowLayoutPanel1->Controls->Add(this->Input);
-			this->flowLayoutPanel1->Controls->Add(this->groupBox1);
 			this->flowLayoutPanel1->Controls->Add(this->groupBox2);
+			this->flowLayoutPanel1->Controls->Add(this->groupBox1);
 			this->flowLayoutPanel1->Controls->Add(this->EquationText);
 			this->flowLayoutPanel1->Controls->Add(this->EquBox);
 			this->flowLayoutPanel1->Location = System::Drawing::Point(2, 2);
@@ -186,6 +188,87 @@ namespace Optimization {
 			this->Input->TabIndex = 1;
 			this->Input->TextChanged += gcnew System::EventHandler(this, &MyForm::Input_TextChanged);
 			// 
+			// groupBox2
+			// 
+			this->groupBox2->Controls->Add(this->InterYText);
+			this->groupBox2->Controls->Add(this->InterXText);
+			this->groupBox2->Controls->Add(this->IniYText);
+			this->groupBox2->Controls->Add(this->IniXText);
+			this->groupBox2->Controls->Add(this->InterY);
+			this->groupBox2->Controls->Add(this->InterX);
+			this->groupBox2->Controls->Add(this->IniY);
+			this->groupBox2->Controls->Add(this->IniX);
+			this->groupBox2->Location = System::Drawing::Point(3, 153);
+			this->groupBox2->Name = L"groupBox2";
+			this->groupBox2->Size = System::Drawing::Size(475, 140);
+			this->groupBox2->TabIndex = 6;
+			this->groupBox2->TabStop = false;
+			this->groupBox2->Text = L"Initial";
+			// 
+			// InterYText
+			// 
+			this->InterYText->AutoSize = true;
+			this->InterYText->Location = System::Drawing::Point(189, 81);
+			this->InterYText->Name = L"InterYText";
+			this->InterYText->Size = System::Drawing::Size(52, 12);
+			this->InterYText->TabIndex = 7;
+			this->InterYText->Text = L"Interval Y";
+			// 
+			// InterXText
+			// 
+			this->InterXText->AutoSize = true;
+			this->InterXText->Location = System::Drawing::Point(10, 82);
+			this->InterXText->Name = L"InterXText";
+			this->InterXText->Size = System::Drawing::Size(52, 12);
+			this->InterXText->TabIndex = 6;
+			this->InterXText->Text = L"Interval X";
+			// 
+			// IniYText
+			// 
+			this->IniYText->AutoSize = true;
+			this->IniYText->Location = System::Drawing::Point(189, 18);
+			this->IniYText->Name = L"IniYText";
+			this->IniYText->Size = System::Drawing::Size(43, 12);
+			this->IniYText->TabIndex = 5;
+			this->IniYText->Text = L"Initial Y";
+			// 
+			// IniXText
+			// 
+			this->IniXText->AutoSize = true;
+			this->IniXText->Location = System::Drawing::Point(10, 18);
+			this->IniXText->Name = L"IniXText";
+			this->IniXText->Size = System::Drawing::Size(43, 12);
+			this->IniXText->TabIndex = 4;
+			this->IniXText->Text = L"Initial X";
+			// 
+			// InterY
+			// 
+			this->InterY->Location = System::Drawing::Point(191, 99);
+			this->InterY->Name = L"InterY";
+			this->InterY->Size = System::Drawing::Size(139, 22);
+			this->InterY->TabIndex = 3;
+			// 
+			// InterX
+			// 
+			this->InterX->Location = System::Drawing::Point(12, 99);
+			this->InterX->Name = L"InterX";
+			this->InterX->Size = System::Drawing::Size(127, 22);
+			this->InterX->TabIndex = 2;
+			// 
+			// IniY
+			// 
+			this->IniY->Location = System::Drawing::Point(191, 33);
+			this->IniY->Name = L"IniY";
+			this->IniY->Size = System::Drawing::Size(139, 22);
+			this->IniY->TabIndex = 1;
+			// 
+			// IniX
+			// 
+			this->IniX->Location = System::Drawing::Point(10, 33);
+			this->IniX->Name = L"IniX";
+			this->IniX->Size = System::Drawing::Size(129, 22);
+			this->IniX->TabIndex = 0;
+			// 
 			// groupBox1
 			// 
 			this->groupBox1->Controls->Add(this->rB_Conjugate);
@@ -193,12 +276,12 @@ namespace Optimization {
 			this->groupBox1->Controls->Add(this->rB_Steep);
 			this->groupBox1->Controls->Add(this->rB_Newton);
 			this->groupBox1->Controls->Add(this->rB_Powell);
-			this->groupBox1->Location = System::Drawing::Point(2, 152);
+			this->groupBox1->Location = System::Drawing::Point(2, 298);
 			this->groupBox1->Margin = System::Windows::Forms::Padding(2);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Padding = System::Windows::Forms::Padding(2);
 			this->groupBox1->Size = System::Drawing::Size(475, 104);
-			this->groupBox1->TabIndex = 2;
+			this->groupBox1->TabIndex = 9;
 			this->groupBox1->TabStop = false;
 			this->groupBox1->Text = L"Method";
 			// 
@@ -213,7 +296,7 @@ namespace Optimization {
 			this->rB_Conjugate->TabStop = true;
 			this->rB_Conjugate->Text = L"Conjugate Gradient Method";
 			this->rB_Conjugate->UseVisualStyleBackColor = true;
-			this->rB_Conjugate->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Conjugate_CheckedChanged);
+			this->rB_Conjugate->CheckedChanged += gcnew System::EventHandler(this, &MyForm::rB_Conjugate_CheckedChanged);
 			// 
 			// rB_Quasi
 			// 
@@ -226,7 +309,7 @@ namespace Optimization {
 			this->rB_Quasi->TabStop = true;
 			this->rB_Quasi->Text = L"Quasi-Newton Method";
 			this->rB_Quasi->UseVisualStyleBackColor = true;
-			this->rB_Quasi->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Quasi_CheckedChanged);
+			this->rB_Quasi->CheckedChanged += gcnew System::EventHandler(this, &MyForm::rB_Quasi_CheckedChanged);
 			// 
 			// rB_Steep
 			// 
@@ -239,7 +322,7 @@ namespace Optimization {
 			this->rB_Steep->TabStop = true;
 			this->rB_Steep->Text = L"Steep Descent Algorithm";
 			this->rB_Steep->UseVisualStyleBackColor = true;
-			this->rB_Steep->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Steep_CheckedChanged);
+			this->rB_Steep->CheckedChanged += gcnew System::EventHandler(this, &MyForm::rB_Steep_CheckedChanged);
 			// 
 			// rB_Newton
 			// 
@@ -252,7 +335,7 @@ namespace Optimization {
 			this->rB_Newton->TabStop = true;
 			this->rB_Newton->Text = L"Newton\'s Method";
 			this->rB_Newton->UseVisualStyleBackColor = true;
-			this->rB_Newton->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Newton_CheckedChanged);
+			this->rB_Newton->CheckedChanged += gcnew System::EventHandler(this, &MyForm::rB_Newton_CheckedChanged);
 			// 
 			// rB_Powell
 			// 
@@ -265,92 +348,7 @@ namespace Optimization {
 			this->rB_Powell->TabStop = true;
 			this->rB_Powell->Text = L"Powell\'s Method";
 			this->rB_Powell->UseVisualStyleBackColor = true;
-			this->rB_Powell->CheckedChanged += gcnew System::EventHandler(this, &MyForm::Powell_CheckedChanged);
-			// 
-			// groupBox2
-			// 
-			this->groupBox2->Controls->Add(this->InterYText);
-			this->groupBox2->Controls->Add(this->InterXText);
-			this->groupBox2->Controls->Add(this->IniYText);
-			this->groupBox2->Controls->Add(this->IniXText);
-			this->groupBox2->Controls->Add(this->InterY);
-			this->groupBox2->Controls->Add(this->InterX);
-			this->groupBox2->Controls->Add(this->IniY);
-			this->groupBox2->Controls->Add(this->IniX);
-			this->groupBox2->Location = System::Drawing::Point(3, 261);
-			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Size = System::Drawing::Size(475, 140);
-			this->groupBox2->TabIndex = 3;
-			this->groupBox2->TabStop = false;
-			this->groupBox2->Text = L"Initial";
-			// 
-			// InterYText
-			// 
-			this->InterYText->AutoSize = true;
-			this->InterYText->Location = System::Drawing::Point(191, 79);
-			this->InterYText->Name = L"InterYText";
-			this->InterYText->Size = System::Drawing::Size(52, 12);
-			this->InterYText->TabIndex = 7;
-			this->InterYText->Text = L"Interval Y";
-			// 
-			// InterXText
-			// 
-			this->InterXText->AutoSize = true;
-			this->InterXText->Location = System::Drawing::Point(12, 80);
-			this->InterXText->Name = L"InterXText";
-			this->InterXText->Size = System::Drawing::Size(52, 12);
-			this->InterXText->TabIndex = 6;
-			this->InterXText->Text = L"Interval X";
-			// 
-			// IniYText
-			// 
-			this->IniYText->AutoSize = true;
-			this->IniYText->Location = System::Drawing::Point(189, 31);
-			this->IniYText->Name = L"IniYText";
-			this->IniYText->Size = System::Drawing::Size(43, 12);
-			this->IniYText->TabIndex = 5;
-			this->IniYText->Text = L"Initial Y";
-			// 
-			// IniXText
-			// 
-			this->IniXText->AutoSize = true;
-			this->IniXText->Location = System::Drawing::Point(10, 31);
-			this->IniXText->Name = L"IniXText";
-			this->IniXText->Size = System::Drawing::Size(43, 12);
-			this->IniXText->TabIndex = 4;
-			this->IniXText->Text = L"Initial X";
-			// 
-			// InterY
-			// 
-			this->InterY->Location = System::Drawing::Point(191, 97);
-			this->InterY->Multiline = true;
-			this->InterY->Name = L"InterY";
-			this->InterY->Size = System::Drawing::Size(139, 22);
-			this->InterY->TabIndex = 3;
-			// 
-			// InterX
-			// 
-			this->InterX->Location = System::Drawing::Point(10, 98);
-			this->InterX->Multiline = true;
-			this->InterX->Name = L"InterX";
-			this->InterX->Size = System::Drawing::Size(129, 22);
-			this->InterX->TabIndex = 2;
-			// 
-			// IniY
-			// 
-			this->IniY->Location = System::Drawing::Point(191, 49);
-			this->IniY->Multiline = true;
-			this->IniY->Name = L"IniY";
-			this->IniY->Size = System::Drawing::Size(139, 22);
-			this->IniY->TabIndex = 1;
-			// 
-			// IniX
-			// 
-			this->IniX->Location = System::Drawing::Point(10, 49);
-			this->IniX->Multiline = true;
-			this->IniX->Name = L"IniX";
-			this->IniX->Size = System::Drawing::Size(129, 22);
-			this->IniX->TabIndex = 0;
+			this->rB_Powell->CheckedChanged += gcnew System::EventHandler(this, &MyForm::rB_Powell_CheckedChanged);
 			// 
 			// EquationText
 			// 
@@ -358,7 +356,7 @@ namespace Optimization {
 			this->EquationText->Location = System::Drawing::Point(3, 404);
 			this->EquationText->Name = L"EquationText";
 			this->EquationText->Size = System::Drawing::Size(47, 12);
-			this->EquationText->TabIndex = 4;
+			this->EquationText->TabIndex = 10;
 			this->EquationText->Text = L"Equation";
 			// 
 			// EquBox
@@ -368,7 +366,7 @@ namespace Optimization {
 			this->EquBox->Name = L"EquBox";
 			this->EquBox->ReadOnly = true;
 			this->EquBox->Size = System::Drawing::Size(474, 209);
-			this->EquBox->TabIndex = 5;
+			this->EquBox->TabIndex = 11;
 			// 
 			// flowLayoutPanel2
 			// 
@@ -442,10 +440,10 @@ namespace Optimization {
 			this->tableLayoutPanel1->ResumeLayout(false);
 			this->flowLayoutPanel1->ResumeLayout(false);
 			this->flowLayoutPanel1->PerformLayout();
-			this->groupBox1->ResumeLayout(false);
-			this->groupBox1->PerformLayout();
 			this->groupBox2->ResumeLayout(false);
 			this->groupBox2->PerformLayout();
+			this->groupBox1->ResumeLayout(false);
+			this->groupBox1->PerformLayout();
 			this->flowLayoutPanel2->ResumeLayout(false);
 			this->flowLayoutPanel2->PerformLayout();
 			this->menuStrip1->ResumeLayout(false);
@@ -479,39 +477,109 @@ namespace Optimization {
 			}
 		}
 	}
-	private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-		Input->Text->Length;
-		Output->Text->Length;
-	}
-	private: System::Void Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 
+	private: System::Void Input_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+		//當Input textbox中的輸入改變時，便會進入此函式
+
+		//判斷輸入自元為'\n'，並防止取到字串-1位置
+		if (Input->Text->Length - 1 >= 0 && Input->Text[Input->Text->Length - 1] == '\n')
+		{
+			//將使用者輸入字串(在userInput中)，依空白作切割
+			array<String^> ^userCommand = userInput->Split(' ');
+			try{
+				if (userCommand[0] == "use" && userCommand->Length == 2) {
+					int k = int::Parse(userCommand[1]); // string to int
+					std::vector<std::string> equations = dataManager->GetEquations();
+					if (k < equations.size()) {
+						UseEquation = gcnew String(equations[k].c_str());
+						FunctionIndex = k;
+					}
+					else {
+						Output->Text += "Equation not Found" + Environment::NewLine;
+					}
+				}
+				else if (userCommand->Length == 1 && userCommand[0] == "/help") {
+					Output->Text += "Nothing I can Help" + Environment::NewLine;
+				}
+				else if (userCommand->Length == 2 && userCommand[0] == "/c" && userCommand[1] == "o") {
+					Output->Text = "";
+				}
+				else if (userCommand->Length == 2 && userCommand[0] == "/c" && userCommand[1] == "i") {
+					Input->Text = "";
+					IniX->Text = "";
+					IniY->Text = "";
+					InterX->Text = "";
+					InterY->Text = "";
+				}
+				else if (userCommand->Length == 1 && userCommand[0] == "/c") {
+					Input->Text = "";
+					IniX->Text = "";
+					IniY->Text = "";
+					InterX->Text = "";
+					InterY->Text = "";
+					Output->Text = "";
+				}
+				else {
+					Output->Text += "Error Command" + Environment::NewLine;
+				}
+			}
+			catch (...) {
+				Output->Text += "Error Command" + Environment::NewLine;
+			}
+			
+
+			userInput = "";
+		}
+		else
+		{
+			//將使用者輸入字串(在Text box中)，依'\n'作切割
+			array<String^> ^userCommand = Input->Text->Split('\n');
+			//並將最後一行，作為目前使用者輸入指令
+			userInput = userCommand[userCommand->Length - 1];
+		}
+	}
+	private: System::Void IniX_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+
+	}
+	private: System::Void IniY_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+
+	}
+	private: System::Void InterX_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+
+	}
+	private: System::Void InterY_TextChanged(System::Object^  sender, System::EventArgs^  e) {
+
+	}
+
+	private: System::Void rB_Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Powell->Checked) {
 			Output->Text += rB_Powell->Name + Environment::NewLine;
 			Method = enPowells;
+			Output->Text += UseEquation + Environment::NewLine;
 		}
 	}
-	private: System::Void Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	private: System::Void rB_Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Steep->Checked) {
 			Output->Text += rB_Steep->Name + Environment::NewLine;
 			Method = enSteep_Descent;
 		}
 	}
-	private: System::Void Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	private: System::Void rB_Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Conjugate->Checked) {
 			Output->Text += rB_Conjugate->Name + Environment::NewLine;
 			Method = enConjugate_Gradient;
 		}
 	}
-	private: System::Void Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-		if (rB_Newton->Checked) {
-			Output->Text += rB_Newton->Name + Environment::NewLine;
-			Method = enNewton;
-		}
-	}
-	private: System::Void Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+	private: System::Void rB_Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Quasi->Checked) {
 			Output->Text += rB_Quasi->Name + Environment::NewLine;
 			Method = enQuasi_Newton;
+		}
+	}
+	private: System::Void rB_Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
+		if (rB_Newton->Checked) {
+			Output->Text += rB_Newton->Name + Environment::NewLine;
+			Method = enNewton;
 		}
 	}
 	};
