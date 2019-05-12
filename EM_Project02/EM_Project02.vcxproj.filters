@@ -41,6 +41,9 @@
     <ClInclude Include="Equation.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
+    <ClInclude Include="Calculator.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyForm.resx">

@@ -4,20 +4,8 @@
 #include <vector>
 using namespace std;
 
-struct Variable {
-	string name;
-	double exp;
+class Equation {
+public:	
+	std::vector<std::string> postfix(std::string);
+	int priority(char);
 };
-
-struct Term {
-	double coeff;
-	vector<Variable>vars;
-};
-
-class Equation
-{
-public:
-	Equation();
-	vector<Term>equation;
-};
-

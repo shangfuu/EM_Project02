@@ -4,7 +4,6 @@
 #include<fstream>
 #include<string>
 
-
 //定義控管資料class
 class DataManager
 {
@@ -23,8 +22,6 @@ public:
 	//取得向量資料
 	std::vector<std::string> GetEquations();
 	std::vector<std::vector<std::string>> GetPostEquations();
-	std::vector<std::string> postfix(std::string);
 	//設置檔案路徑名稱
 	void SetFileName(std::string fileName);
-	int priority(char);
 };
