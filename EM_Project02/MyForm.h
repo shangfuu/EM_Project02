@@ -66,6 +66,10 @@ namespace Optimization {
 		DataManager * dataManager;
 		String^ userInput;
 		String^ UseEquation;
+	private: System::Windows::Forms::Button^  OptimizeButton;
+	protected:
+
+	protected:
 		int FunctionIndex;
 		/// 清除任何使用中的資源。
 		/// </summary>
@@ -83,11 +87,7 @@ namespace Optimization {
 	private: System::Windows::Forms::TextBox^  Input;
 	private: System::Windows::Forms::Label^  OutputText;
 	private: System::Windows::Forms::TextBox^  Output;
-
-
-
 	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
-
 	private:
 		/// <summary>
 		/// 設計工具所需的變數。
@@ -115,6 +115,7 @@ namespace Optimization {
 			this->IniY = (gcnew System::Windows::Forms::TextBox());
 			this->IniX = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->OptimizeButton = (gcnew System::Windows::Forms::Button());
 			this->rB_Conjugate = (gcnew System::Windows::Forms::RadioButton());
 			this->rB_Quasi = (gcnew System::Windows::Forms::RadioButton());
 			this->rB_Steep = (gcnew System::Windows::Forms::RadioButton());
@@ -271,6 +272,7 @@ namespace Optimization {
 			// 
 			// groupBox1
 			// 
+			this->groupBox1->Controls->Add(this->OptimizeButton);
 			this->groupBox1->Controls->Add(this->rB_Conjugate);
 			this->groupBox1->Controls->Add(this->rB_Quasi);
 			this->groupBox1->Controls->Add(this->rB_Steep);
@@ -284,6 +286,16 @@ namespace Optimization {
 			this->groupBox1->TabIndex = 9;
 			this->groupBox1->TabStop = false;
 			this->groupBox1->Text = L"Method";
+			// 
+			// OptimizeButton
+			// 
+			this->OptimizeButton->Location = System::Drawing::Point(339, 62);
+			this->OptimizeButton->Name = L"OptimizeButton";
+			this->OptimizeButton->Size = System::Drawing::Size(75, 23);
+			this->OptimizeButton->TabIndex = 5;
+			this->OptimizeButton->Text = L"Optimize";
+			this->OptimizeButton->UseVisualStyleBackColor = true;
+			this->OptimizeButton->Click += gcnew System::EventHandler(this, &MyForm::OptimizeButton_Click);
 			// 
 			// rB_Conjugate
 			// 
@@ -486,7 +498,8 @@ namespace Optimization {
 		{
 			//將使用者輸入字串(在userInput中)，依空白作切割
 			array<String^> ^userCommand = userInput->Split(' ');
-			try{
+
+			try {
 				if (userCommand[0] == "use" && userCommand->Length == 2) {
 					int k = int::Parse(userCommand[1]); // string to int
 					std::vector<std::string> equations = dataManager->GetEquations();
@@ -526,8 +539,6 @@ namespace Optimization {
 			catch (...) {
 				Output->Text += "Error Command" + Environment::NewLine;
 			}
-			
-
 			userInput = "";
 		}
 		else
@@ -538,49 +549,59 @@ namespace Optimization {
 			userInput = userCommand[userCommand->Length - 1];
 		}
 	}
-	private: System::Void IniX_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-
-	}
-	private: System::Void IniY_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-
-	}
-	private: System::Void InterX_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-
-	}
-	private: System::Void InterY_TextChanged(System::Object^  sender, System::EventArgs^  e) {
-
-	}
 
 	private: System::Void rB_Powell_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Powell->Checked) {
-			Output->Text += rB_Powell->Name + Environment::NewLine;
+			Output->Text += "Powell’s Method" + Environment::NewLine;
 			Method = enPowells;
-			Output->Text += UseEquation + Environment::NewLine;
 		}
 	}
 	private: System::Void rB_Steep_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Steep->Checked) {
-			Output->Text += rB_Steep->Name + Environment::NewLine;
+			Output->Text += "Steep Descent Algorithm" + Environment::NewLine;
 			Method = enSteep_Descent;
 		}
 	}
 	private: System::Void rB_Conjugate_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Conjugate->Checked) {
-			Output->Text += rB_Conjugate->Name + Environment::NewLine;
+			Output->Text += "Conjugate Gradient Method" + Environment::NewLine;
 			Method = enConjugate_Gradient;
 		}
 	}
 	private: System::Void rB_Quasi_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Quasi->Checked) {
-			Output->Text += rB_Quasi->Name + Environment::NewLine;
+			Output->Text += "Quasi-Newton Method" + Environment::NewLine;
 			Method = enQuasi_Newton;
 		}
 	}
 	private: System::Void rB_Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Newton->Checked) {
-			Output->Text += rB_Newton->Name + Environment::NewLine;
+			Output->Text += "Newton Method" + Environment::NewLine;
 			Method = enNewton;
 		}
 	}
-	};
+
+	private: System::Void OptimizeButton_Click(System::Object^  sender, System::EventArgs^  e) {
+		if (IniX->Text != "" && IniY->Text != "" &&InterX->Text != "" &&InterY->Text != "" && Input->Text != "") {
+			if (Method == 0) {
+				Output->Text += "Powell’s Method" + Environment::NewLine;
+			}
+			else if (Method == 1) {
+				Output->Text += "Newton Method" + Environment::NewLine;
+			}
+			else if (Method == 2) {
+				Output->Text += "Steep Method" + Environment::NewLine;
+			}
+			else if (Method == 3) {
+				Output->Text += "Quasi Method" + Environment::NewLine;
+			}
+			else {
+				Output->Text += "Conjugate Method" + Environment::NewLine;
+			}
+		}
+		else {
+			Output->Text += "Ever TextBox Should be Initial" + Environment::NewLine;
+		}
+	}
+};
 }
