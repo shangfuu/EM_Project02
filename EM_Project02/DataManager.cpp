@@ -20,7 +20,6 @@ bool DataManager::LoadEquationData()
 	{
 		//定義讀取檔案字串暫存變數
 		std::string tempString;
-		Equation equations;
 		//執行讀檔迴圈，並在讀到檔案結尾時結束
 		while (!fin.eof())
 		{
@@ -30,7 +29,8 @@ bool DataManager::LoadEquationData()
 			Equations.push_back(tempString);
 			//遞增EquationIndex，標記到當前讀取向量ID
 			EquationIndex++;
-			postfix_equations.push_back(equations.postfix(tempString));
+			postfix_equations.push_back(postfix(tempString));
+			
 		}
 		return true;
 	}
@@ -44,6 +44,11 @@ std::vector<std::string> DataManager::GetEquations()
 std::vector<std::vector<std::string>> DataManager::GetPostEquations()
 {
 	return postfix_equations;
+}
+
+std::vector<std::string> DataManager::GetPostEquations(int index)
+{
+	return postfix_equations[index];
 }
 
 void DataManager::SetFileName(std::string fileName)

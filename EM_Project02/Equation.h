@@ -2,10 +2,27 @@
 #include <iostream>
 #include <string>
 #include <vector>
-using namespace std;
+#define threshold 10E-8
 
 class Equation {
 public:	
-	std::vector<std::string> postfix(std::string);
-	int priority(char);
+
+	/* Method */
+	double goldenSectionSearch(double, double, double, double);
+	double f(double);
+	double f(double, double);
+	double differentationX(double, double);
+	double differentationY(double, double);
+
+	/* Optimization Method */
+
+
+	/* Extra Method */
+	friend std::vector<std::string> postfix(std::string);	// postfix
+	void SetEquation(std::vector<std::string>);
+
+	/* Member */
+	std::vector<std::string> equation;
+
 };
+int priority(char);

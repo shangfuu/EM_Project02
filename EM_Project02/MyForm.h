@@ -1,7 +1,7 @@
 #pragma once
+#include "Equation.h"
 #include "DataManager.h"
 #include "DotNetUtilities.h"
-
 
 namespace Optimization {
 
@@ -36,7 +36,6 @@ namespace Optimization {
 			//
 		}
 	private: System::Windows::Forms::MenuStrip^  menuStrip1;
-	public:
 	private: System::Windows::Forms::ToolStripMenuItem^  fileToolStripMenuItem;
 	private: System::Windows::Forms::ToolStripMenuItem^  loadEquationsToolStripMenuItem;
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel2;
@@ -45,7 +44,6 @@ namespace Optimization {
 	private: System::Windows::Forms::Label^  InterXText;
 	private: System::Windows::Forms::Label^  IniYText;
 	private: System::Windows::Forms::Label^  IniXText;
-
 	private: System::Windows::Forms::TextBox^  InterX;
 	private: System::Windows::Forms::TextBox^  IniY;
 	private: System::Windows::Forms::TextBox^  IniX;
@@ -58,18 +56,20 @@ namespace Optimization {
 	private: System::Windows::Forms::Label^  EquationText;
 	private: System::Windows::Forms::TextBox^  EquBox;
 	private: System::Windows::Forms::TextBox^  InterY;
-
-	public:
+	private: System::Windows::Forms::Button^  OptimizeButton;
+	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
+	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel1;
+	private: System::Windows::Forms::Label^  InputText;
+	private: System::Windows::Forms::TextBox^  Input;
+	private: System::Windows::Forms::Label^  OutputText;
+	private: System::Windows::Forms::TextBox^  Output;
+	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
 
 	protected:
 		/// <summary>
 		DataManager * dataManager;
 		String^ userInput;
 		String^ UseEquation;
-	private: System::Windows::Forms::Button^  OptimizeButton;
-	protected:
-
-	protected:
 		int FunctionIndex;
 		/// 清除任何使用中的資源。
 		/// </summary>
@@ -80,14 +80,7 @@ namespace Optimization {
 				delete components;
 			}
 		}
-	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
-	protected:
-	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel1;
-	private: System::Windows::Forms::Label^  InputText;
-	private: System::Windows::Forms::TextBox^  Input;
-	private: System::Windows::Forms::Label^  OutputText;
-	private: System::Windows::Forms::TextBox^  Output;
-	private: System::Windows::Forms::OpenFileDialog^  openFileDialog1;
+	
 	private:
 		/// <summary>
 		/// 設計工具所需的變數。
@@ -583,8 +576,15 @@ namespace Optimization {
 
 	private: System::Void OptimizeButton_Click(System::Object^  sender, System::EventArgs^  e) {
 		if (IniX->Text != "" && IniY->Text != "" &&InterX->Text != "" &&InterY->Text != "" && Input->Text != "") {
+			// Get postEquation
+			std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
+			Equation f;
+			f.SetEquation(postEquation);
+
 			if (Method == 0) {
 				Output->Text += "Powell’s Method" + Environment::NewLine;
+				
+				
 			}
 			else if (Method == 1) {
 				Output->Text += "Newton Method" + Environment::NewLine;
