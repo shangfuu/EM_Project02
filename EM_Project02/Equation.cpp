@@ -1,5 +1,8 @@
 #include "Equation.h"
 
+Equation::Equation()
+{
+}
 
 std::vector<std::string> postfix(std::string str) {
 	std::vector<char> stack;
@@ -90,9 +93,23 @@ int priority(char op) {
 
 void Equation::SetEquation(std::vector<std::string>equ)
 {
-	for (int i = 0; i < equ.size(); i++) {
-		this->equation.push_back(equ[i]);
+	equation = equ;
+
+	// calculate dim
+	bool meetX = false, meetY = false;
+	for (int i = 0; i < equation.size(); i++) {
+		if (equation[i] == "x" && !meetX)
+			meetX = true;
+		else if (equation[i] == "y" && !meetY)
+			meetY = true;
+
+		if (meetX && meetY) break; // Terminate Earlier if meet both XY
 	}
+
+	if (meetX && meetY)	dim = 3;
+	else if (meetY) dim = 2;
+	else if (meetX) dim = 1;
+	else dim = 0;	// No meet
 }
 
 double Equation::goldenSectionSearch(double a, double b, double c, double tau)
@@ -110,7 +127,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, double tau)
 	if (abs(c - a) < tau * (abs(b) + abs(x))) {
 		return (c + a) / 2;
 	}
-	if (f(x, 0) < f(b,0)) {
+	if (f(x, 0) < f(b, 0)) {
 		if (c - b > b - a)	return goldenSectionSearch(b, x, c, tau);
 		else return goldenSectionSearch(a, x, b, tau);
 	}
@@ -187,6 +204,80 @@ double Equation::dY(double x, double y) {
 	return ((f(x, y + threshold) - f(x, y - threshold)) / (2 * threshold));
 }
 
+Matrix Gradient(double x, double y, Equation F)
+{
+	Matrix gradient;
+
+	if (F.dim == 3) {	// XY
+		Vector dX, dY;
+		dX.Data.push_back(F.dX(x, y));
+		dY.Data.push_back(F.dY(x, y));
+		gradient.Data.push_back(dX);
+		gradient.Data.push_back(dY);
+	}
+	else if (F.dim == 2) {	// Y
+		Vector dY;
+		dY.Data.push_back(F.dY(x, y));
+		gradient.Data.push_back(dY);
+	}
+	else if (F.dim == 1) {	// X
+		Vector dX;
+		dX.Data.push_back(F.dX(x, y));
+		gradient.Data.push_back(dX);
+	}
+	else {	// No X Y
+		Vector Zero;
+		Zero.Data.push_back(0);
+		gradient.Data.push_back(Zero);
+	}
+
+	return gradient;
+}
+
+Matrix Hessian(double x, double y, Equation F)
+{
+	Matrix hessian;
+
+	if (F.dim == 3) {	// XY
+		double dXX = 0, dYX = 0, dXY = 0, dYY = 0;
+		Vector row1, row2;
+		dXX = (F.dX(x + threshold, y) - F.dX(x - threshold, y)) / (2 * threshold);
+		dYX = (F.dY(x + threshold, y) - F.dY(x - threshold, y)) / (2 * threshold);
+		dXY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
+		dYY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
+		row1.Data.push_back(dXX);
+		row1.Data.push_back(dYX);
+		row2.Data.push_back(dXY);
+		row2.Data.push_back(dYY);
+		hessian.Data.push_back(row1);
+		hessian.Data.push_back(row2);
+	}
+	else if (F.dim == 2) {	// Y
+		Vector row1;
+		double dYY = 0;
+		dYY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
+		row1.Data.push_back(dYY);
+		hessian.Data.push_back(row1);
+	}
+	else if (F.dim == 1) {	// X
+		Vector row1;
+		double dXX = 0;
+		dXX = (F.dX(x + threshold, y) - F.dX(x - threshold, y)) / (2 * threshold);
+		row1.Data.push_back(dXX);
+		hessian.Data.push_back(row1);
+	}
+	else {
+		Vector Zero;
+		Zero.Data.push_back(0);
+		hessian.Data.push_back(Zero);
+	}
+
+	return hessian;
+}
+
 void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax)
 {
+
+
+
 }

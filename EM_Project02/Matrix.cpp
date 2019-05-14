@@ -4,9 +4,9 @@ Matrix::Matrix()
 {
 }
 
-Matrix::Matrix(std::vector<Vector>)
+Matrix::Matrix(std::vector<Vector>matrix)
 {
-
+	this->Data = matrix;
 }
 
 Matrix operator+(const Matrix& m1, const Matrix& m2)
