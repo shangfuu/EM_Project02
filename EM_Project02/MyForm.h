@@ -578,12 +578,56 @@ namespace Optimization {
 		if (IniX->Text != "" && IniY->Text != "" &&InterX->Text != "" &&InterY->Text != "" && Input->Text != "") {
 			// Get postEquation
 			std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
+			int cnt = 0;
 			Equation f;
 			f.SetEquation(postEquation);
-
+			std::string initialx, initialy, interXup, interXdown, interYup, interYdown, input, temp;
+			MarshalString(IniX->Text, temp);
+			initialx = temp;
+			MarshalString(IniY->Text, temp);
+			initialy = temp;
+			MarshalString(InterX->Text, temp);
+			std::stringstream ss;
+			ss << temp;
+			while (getline(ss, temp, ',')) {
+				if (cnt == 0) {
+					interXup = temp;
+					cnt++;
+				}
+				else {
+					interXdown = temp;
+				}
+			}
+			cnt = 0;
+			ss.clear();
+			MarshalString(InterY->Text, temp);
+			ss << temp;
+			while (getline(ss, temp, ',')) {
+				if (cnt == 0) {
+					interYup = temp;
+					cnt++;
+				}
+				else {
+					interYdown = temp;
+				}
+			}
+			cnt = 0;
+			ss.clear();
+			temp = "";
 			if (Method == 0) {
 				Output->Text += "Powell¡¦s Method" + Environment::NewLine;
-				
+				if (IniY->Text == "N") {
+
+				}
+				else {
+					double initx = std::stod(initialx);
+					double inity = std::stod(initialy);
+					double xup = std::stod(interXup);
+					double xdown = std::stod(interXdown);
+					double yup = std::stod(interYup);
+					double ydown = std::stod(interYdown);
+					int x;
+				}
 				
 			}
 			else if (Method == 1) {

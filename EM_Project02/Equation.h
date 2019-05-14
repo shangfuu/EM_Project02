@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 #define threshold 10E-8
 
 class Equation {

@@ -120,10 +120,9 @@ double Equation::goldenSectionSearch(double a, double b, double c, double tau)
 	}
 }
 
-double Equation::f(double)
+double Equation::f(double x)
 {
-	this->equation;
-	return 0.0;
+	return (f(x, 0));
 }
 
 double Equation::f(double x, double y) {
