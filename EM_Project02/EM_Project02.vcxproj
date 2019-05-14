@@ -141,16 +141,20 @@
     <ClCompile Include="DataManager.cpp" />
     <ClCompile Include="DotNetUitilities.cpp" />
     <ClCompile Include="Equation.cpp" />
+    <ClCompile Include="Matrix.cpp" />
     <ClCompile Include="MyForm.cpp" />
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calculator.h" />
     <ClInclude Include="DataManager.h" />
     <ClInclude Include="DotNetUtilities.h" />
     <ClInclude Include="Equation.h" />
+    <ClInclude Include="Matrix.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyForm.resx">

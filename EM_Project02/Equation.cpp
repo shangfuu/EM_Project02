@@ -186,3 +186,7 @@ double Equation::dX(double x, double y) {
 double Equation::dY(double x, double y) {
 	return ((f(x, y + threshold) - f(x, y - threshold)) / (2 * threshold));
 }
+
+void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax)
+{
+}
