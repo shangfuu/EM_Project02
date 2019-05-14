@@ -70,11 +70,13 @@ namespace Optimization {
 		DataManager * dataManager;
 		String^ userInput;
 		String^ UseEquation;
+		bool loadFile = false;	// 判斷是否讀檔
 	private: System::Windows::Forms::Label^  symbol2;
 	protected:
 	private: System::Windows::Forms::Label^  symbol1;
 	private: System::Windows::Forms::TextBox^  MaxY;
 	private: System::Windows::Forms::TextBox^  MaxX;
+	private: System::Windows::Forms::Button^  OptimizeButton;
 
 			 int FunctionIndex;
 			 /// 清除任何使用中的資源。
@@ -118,6 +120,7 @@ namespace Optimization {
 			this->IniY = (gcnew System::Windows::Forms::TextBox());
 			this->IniX = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->OptimizeButton = (gcnew System::Windows::Forms::Button());
 			this->rB_Conjugate = (gcnew System::Windows::Forms::RadioButton());
 			this->rB_Quasi = (gcnew System::Windows::Forms::RadioButton());
 			this->rB_Steep = (gcnew System::Windows::Forms::RadioButton());
@@ -310,6 +313,7 @@ namespace Optimization {
 			// 
 			// groupBox1
 			// 
+			this->groupBox1->Controls->Add(this->OptimizeButton);
 			this->groupBox1->Controls->Add(this->rB_Conjugate);
 			this->groupBox1->Controls->Add(this->rB_Quasi);
 			this->groupBox1->Controls->Add(this->rB_Steep);
@@ -323,6 +327,16 @@ namespace Optimization {
 			this->groupBox1->TabIndex = 9;
 			this->groupBox1->TabStop = false;
 			this->groupBox1->Text = L"Method";
+			// 
+			// OptimizeButton
+			// 
+			this->OptimizeButton->Location = System::Drawing::Point(334, 62);
+			this->OptimizeButton->Name = L"OptimizeButton";
+			this->OptimizeButton->Size = System::Drawing::Size(75, 23);
+			this->OptimizeButton->TabIndex = 5;
+			this->OptimizeButton->Text = L"Optimize";
+			this->OptimizeButton->UseVisualStyleBackColor = true;
+			this->OptimizeButton->Click += gcnew System::EventHandler(this, &MyForm::OptimizeButton_Click);
 			// 
 			// rB_Conjugate
 			// 
@@ -507,6 +521,7 @@ namespace Optimization {
 		//從讀取讀取向量資料
 		if (dataManager->LoadEquationData())
 		{
+			loadFile = true;	//	judge at button click
 			std::vector<std::string> equations = dataManager->GetEquations();
 			EquBox->Multiline = true;
 			for (unsigned int i = 0; i < equations.size(); i++)
@@ -528,61 +543,23 @@ namespace Optimization {
 
 			try {
 				if (userCommand[0] == "use" && userCommand->Length == 2) {
+					// Get postEquation
+					int k = int::Parse(userCommand[1]); // string to int
+					std::vector<std::string> equations = dataManager->GetEquations();
 
-					if (IniX->Text != "" && IniY->Text != "" &&MinX->Text != "" &&MinY->Text != "" && Input->Text != "") {
-
-						// Get postEquation
-						int k = int::Parse(userCommand[1]); // string to int
-						std::vector<std::string> equations = dataManager->GetEquations();
-
-						if (k < equations.size() && k >= 0) {
-							//	UseEquation = gcnew String(equations[k].c_str());
-							FunctionIndex = k;
-							std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
-							Equation f;
-							f.SetEquation(postEquation);
-
-							double x = double::Parse(IniX->Text);
-							double y = double::Parse(IniY->Text);
-							double xMin = double::Parse(MinX->Text);
-							double yMin = double::Parse(MinY->Text);
-							double xMax = double::Parse(MaxX->Text);
-							double yMax = double::Parse(MaxY->Text);
-
-							f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax);	// Example call;
-
-							/* TEST */
-							Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +
-								MaxY->Text + Environment::NewLine;
-
-
-							if (Method == 0) {
-								Output->Text += "Powell’s Method" + Environment::NewLine;
-							}
-							else if (Method == 1) {
-								Output->Text += "Newton Method" + Environment::NewLine;
-							}
-							else if (Method == 2) {
-								Output->Text += "Steep Method" + Environment::NewLine;
-								
-							}
-							else if (Method == 3) {
-								Output->Text += "Quasi Method" + Environment::NewLine;
-							}
-							else {
-								Output->Text += "Conjugate Method" + Environment::NewLine;
-							}
-						}
-						else if (equations.size() == 0) {
-							Output->Text += "Please Load Equation File First" + Environment::NewLine;
-						}
-						else {
-							Output->Text += "Equation not Found" + Environment::NewLine;
-						}
+					if (k < equations.size() && k >= 0) {
+						UseEquation = gcnew String(equations[k].c_str());
+						FunctionIndex = k;
+					}
+					else if (equations.size() == 0) {
+						Output->Text += "Please Load Equation File First" + Environment::NewLine;
+						UseEquation = "Error";
 					}
 					else {
-						Output->Text += "Every TextBox Should be Initial" + Environment::NewLine;
+						Output->Text += "Equation not Found" + Environment::NewLine;
+						UseEquation = "Error";
 					}
+
 				}
 				else if (userCommand->Length == 1 && userCommand[0] == "/help") {
 					Output->Text += "Nothing I can Help" + Environment::NewLine;
@@ -610,7 +587,8 @@ namespace Optimization {
 				}
 			}
 			catch (...) {
-				Output->Text += "Error FomatException" + Environment::NewLine;
+				Output->Text += "Error Fomat." + Environment::NewLine;
+				UseEquation = "Error";
 			}
 			userInput = "";
 		}
@@ -646,6 +624,57 @@ namespace Optimization {
 	private: System::Void rB_Newton_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
 		if (rB_Newton->Checked) {
 			Method = enNewton;
+		}
+	}
+
+	private: System::Void OptimizeButton_Click(System::Object^  sender, System::EventArgs^  e) {
+		try {
+			if (loadFile == false || UseEquation == "Error") {
+				Output->Text += "Error File loaded" + Environment::NewLine;
+			}
+			else if (IniX->Text != "" && IniY->Text != "" &&MinX->Text != "" &&MinY->Text != "" && Input->Text != "") {
+
+				std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
+				Equation f;
+				f.SetEquation(postEquation);
+
+				double x = double::Parse(IniX->Text);
+				double y = double::Parse(IniY->Text);
+				double xMin = double::Parse(MinX->Text);
+				double yMin = double::Parse(MinY->Text);
+				double xMax = double::Parse(MaxX->Text);
+				double yMax = double::Parse(MaxY->Text);
+
+				f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax);	// Example call;
+
+				/* TEST */
+				Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +
+					MaxY->Text + Environment::NewLine;
+
+
+				if (Method == 0) {
+					Output->Text += "Powell’s Method" + Environment::NewLine;
+				}
+				else if (Method == 1) {
+					Output->Text += "Newton Method" + Environment::NewLine;
+				}
+				else if (Method == 2) {
+					Output->Text += "Steep Method" + Environment::NewLine;
+				}
+				else if (Method == 3) {
+					Output->Text += "Quasi Method" + Environment::NewLine;
+				}
+				else {
+					Output->Text += "Conjugate Method" + Environment::NewLine;
+				}
+
+			}
+			else {
+				Output->Text += "Every TextBox Should be Initial" + Environment::NewLine;
+			}
+		}
+		catch (...) {
+			Output->Text += "Error Input." + Environment::NewLine;
 		}
 	}
 
