@@ -44,7 +44,7 @@ namespace Optimization {
 	private: System::Windows::Forms::Label^  InterXText;
 	private: System::Windows::Forms::Label^  IniYText;
 	private: System::Windows::Forms::Label^  IniXText;
-	private: System::Windows::Forms::TextBox^  InterX;
+	private: System::Windows::Forms::TextBox^  MinX;
 	private: System::Windows::Forms::TextBox^  IniY;
 	private: System::Windows::Forms::TextBox^  IniX;
 	private: System::Windows::Forms::GroupBox^  groupBox1;
@@ -55,7 +55,7 @@ namespace Optimization {
 	private: System::Windows::Forms::RadioButton^  rB_Powell;
 	private: System::Windows::Forms::Label^  EquationText;
 	private: System::Windows::Forms::TextBox^  EquBox;
-	private: System::Windows::Forms::TextBox^  InterY;
+	private: System::Windows::Forms::TextBox^  MinY;
 	private: System::Windows::Forms::Button^  OptimizeButton;
 	private: System::Windows::Forms::TableLayoutPanel^  tableLayoutPanel1;
 	private: System::Windows::Forms::FlowLayoutPanel^  flowLayoutPanel1;
@@ -70,17 +70,22 @@ namespace Optimization {
 		DataManager * dataManager;
 		String^ userInput;
 		String^ UseEquation;
-		int FunctionIndex;
-		/// 清除任何使用中的資源。
-		/// </summary>
-		~MyForm()
-		{
-			if (components)
-			{
-				delete components;
-			}
-		}
-	
+	private: System::Windows::Forms::Label^  symbol2;
+	protected:
+	private: System::Windows::Forms::Label^  symbol1;
+	private: System::Windows::Forms::TextBox^  MaxY;
+	private: System::Windows::Forms::TextBox^  MaxX;
+			 int FunctionIndex;
+			 /// 清除任何使用中的資源。
+			 /// </summary>
+			 ~MyForm()
+			 {
+				 if (components)
+				 {
+					 delete components;
+				 }
+			 }
+
 	private:
 		/// <summary>
 		/// 設計工具所需的變數。
@@ -99,12 +104,16 @@ namespace Optimization {
 			this->InputText = (gcnew System::Windows::Forms::Label());
 			this->Input = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->symbol2 = (gcnew System::Windows::Forms::Label());
+			this->symbol1 = (gcnew System::Windows::Forms::Label());
+			this->MaxY = (gcnew System::Windows::Forms::TextBox());
+			this->MaxX = (gcnew System::Windows::Forms::TextBox());
 			this->InterYText = (gcnew System::Windows::Forms::Label());
 			this->InterXText = (gcnew System::Windows::Forms::Label());
 			this->IniYText = (gcnew System::Windows::Forms::Label());
 			this->IniXText = (gcnew System::Windows::Forms::Label());
-			this->InterY = (gcnew System::Windows::Forms::TextBox());
-			this->InterX = (gcnew System::Windows::Forms::TextBox());
+			this->MinY = (gcnew System::Windows::Forms::TextBox());
+			this->MinX = (gcnew System::Windows::Forms::TextBox());
 			this->IniY = (gcnew System::Windows::Forms::TextBox());
 			this->IniX = (gcnew System::Windows::Forms::TextBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
@@ -184,12 +193,16 @@ namespace Optimization {
 			// 
 			// groupBox2
 			// 
+			this->groupBox2->Controls->Add(this->symbol2);
+			this->groupBox2->Controls->Add(this->symbol1);
+			this->groupBox2->Controls->Add(this->MaxY);
+			this->groupBox2->Controls->Add(this->MaxX);
 			this->groupBox2->Controls->Add(this->InterYText);
 			this->groupBox2->Controls->Add(this->InterXText);
 			this->groupBox2->Controls->Add(this->IniYText);
 			this->groupBox2->Controls->Add(this->IniXText);
-			this->groupBox2->Controls->Add(this->InterY);
-			this->groupBox2->Controls->Add(this->InterX);
+			this->groupBox2->Controls->Add(this->MinY);
+			this->groupBox2->Controls->Add(this->MinX);
 			this->groupBox2->Controls->Add(this->IniY);
 			this->groupBox2->Controls->Add(this->IniX);
 			this->groupBox2->Location = System::Drawing::Point(3, 153);
@@ -198,6 +211,38 @@ namespace Optimization {
 			this->groupBox2->TabIndex = 6;
 			this->groupBox2->TabStop = false;
 			this->groupBox2->Text = L"Initial";
+			// 
+			// symbol2
+			// 
+			this->symbol2->AutoSize = true;
+			this->symbol2->Location = System::Drawing::Point(238, 102);
+			this->symbol2->Name = L"symbol2";
+			this->symbol2->Size = System::Drawing::Size(11, 12);
+			this->symbol2->TabIndex = 11;
+			this->symbol2->Text = L"~";
+			// 
+			// symbol1
+			// 
+			this->symbol1->AutoSize = true;
+			this->symbol1->Location = System::Drawing::Point(59, 102);
+			this->symbol1->Name = L"symbol1";
+			this->symbol1->Size = System::Drawing::Size(11, 12);
+			this->symbol1->TabIndex = 10;
+			this->symbol1->Text = L"~";
+			// 
+			// MaxY
+			// 
+			this->MaxY->Location = System::Drawing::Point(255, 99);
+			this->MaxY->Name = L"MaxY";
+			this->MaxY->Size = System::Drawing::Size(41, 22);
+			this->MaxY->TabIndex = 9;
+			// 
+			// MaxX
+			// 
+			this->MaxX->Location = System::Drawing::Point(76, 99);
+			this->MaxX->Name = L"MaxX";
+			this->MaxX->Size = System::Drawing::Size(41, 22);
+			this->MaxX->TabIndex = 8;
 			// 
 			// InterYText
 			// 
@@ -235,19 +280,19 @@ namespace Optimization {
 			this->IniXText->TabIndex = 4;
 			this->IniXText->Text = L"Initial X";
 			// 
-			// InterY
+			// MinY
 			// 
-			this->InterY->Location = System::Drawing::Point(191, 99);
-			this->InterY->Name = L"InterY";
-			this->InterY->Size = System::Drawing::Size(139, 22);
-			this->InterY->TabIndex = 3;
+			this->MinY->Location = System::Drawing::Point(191, 99);
+			this->MinY->Name = L"MinY";
+			this->MinY->Size = System::Drawing::Size(41, 22);
+			this->MinY->TabIndex = 3;
 			// 
-			// InterX
+			// MinX
 			// 
-			this->InterX->Location = System::Drawing::Point(12, 99);
-			this->InterX->Name = L"InterX";
-			this->InterX->Size = System::Drawing::Size(127, 22);
-			this->InterX->TabIndex = 2;
+			this->MinX->Location = System::Drawing::Point(12, 99);
+			this->MinX->Name = L"MinX";
+			this->MinX->Size = System::Drawing::Size(41, 22);
+			this->MinX->TabIndex = 2;
 			// 
 			// IniY
 			// 
@@ -258,9 +303,9 @@ namespace Optimization {
 			// 
 			// IniX
 			// 
-			this->IniX->Location = System::Drawing::Point(10, 33);
+			this->IniX->Location = System::Drawing::Point(12, 33);
 			this->IniX->Name = L"IniX";
-			this->IniX->Size = System::Drawing::Size(129, 22);
+			this->IniX->Size = System::Drawing::Size(139, 22);
 			this->IniX->TabIndex = 0;
 			// 
 			// groupBox1
@@ -514,15 +559,15 @@ namespace Optimization {
 					Input->Text = "";
 					IniX->Text = "";
 					IniY->Text = "";
-					InterX->Text = "";
-					InterY->Text = "";
+					MinX->Text = "";
+					MinY->Text = "";
 				}
 				else if (userCommand->Length == 1 && userCommand[0] == "/c") {
 					Input->Text = "";
 					IniX->Text = "";
 					IniY->Text = "";
-					InterX->Text = "";
-					InterY->Text = "";
+					MinX->Text = "";
+					MinY->Text = "";
 					Output->Text = "";
 				}
 				else {
@@ -575,77 +620,48 @@ namespace Optimization {
 	}
 
 	private: System::Void OptimizeButton_Click(System::Object^  sender, System::EventArgs^  e) {
-		if (IniX->Text != "" && IniY->Text != "" &&InterX->Text != "" &&InterY->Text != "" && Input->Text != "") {
-			// Get postEquation
-			std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
-			int cnt = 0;
-			Equation f;
-			f.SetEquation(postEquation);
-			std::string initialx, initialy, interXup, interXdown, interYup, interYdown, input, temp;
-			MarshalString(IniX->Text, temp);
-			initialx = temp;
-			MarshalString(IniY->Text, temp);
-			initialy = temp;
-			MarshalString(InterX->Text, temp);
-			std::stringstream ss;
-			ss << temp;
-			while (getline(ss, temp, ',')) {
-				if (cnt == 0) {
-					interXup = temp;
-					cnt++;
-				}
-				else {
-					interXdown = temp;
-				}
-			}
-			cnt = 0;
-			ss.clear();
-			MarshalString(InterY->Text, temp);
-			ss << temp;
-			while (getline(ss, temp, ',')) {
-				if (cnt == 0) {
-					interYup = temp;
-					cnt++;
-				}
-				else {
-					interYdown = temp;
-				}
-			}
-			cnt = 0;
-			ss.clear();
-			temp = "";
-			if (Method == 0) {
-				Output->Text += "Powell’s Method" + Environment::NewLine;
-				if (IniY->Text == "N") {
+		try {
+			if (IniX->Text != "" && IniY->Text != "" &&MinX->Text != "" &&MinY->Text != "" && Input->Text != "") {
+				// Get postEquation
+				std::vector<std::string>postEquation = dataManager->GetPostEquations(FunctionIndex);
+				Equation f;
+				f.SetEquation(postEquation);
 
+				double x = double::Parse(IniX->Text);
+				double y = double::Parse(IniY->Text);
+				double xMin = double::Parse(MinX->Text);
+				double yMin = double::Parse(MinY->Text);
+				double xMax = double::Parse(MaxX->Text);
+				double yMax = double::Parse(MaxY->Text);
+				
+				f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax);	// Example call;
+
+
+				if (Method == 0) {
+					Output->Text += "Powell’s Method" + Environment::NewLine;
+				}
+				else if (Method == 1) {
+					Output->Text += "Newton Method" + Environment::NewLine;
+				}
+				else if (Method == 2) {
+					Output->Text += "Steep Method" + Environment::NewLine;
+				}
+				else if (Method == 3) {
+					Output->Text += "Quasi Method" + Environment::NewLine;
 				}
 				else {
-					double initx = std::stod(initialx);
-					double inity = std::stod(initialy);
-					double xup = std::stod(interXup);
-					double xdown = std::stod(interXdown);
-					double yup = std::stod(interYup);
-					double ydown = std::stod(interYdown);
-					int x;
+					Output->Text += "Conjugate Method" + Environment::NewLine;
 				}
-				
-			}
-			else if (Method == 1) {
-				Output->Text += "Newton Method" + Environment::NewLine;
-			}
-			else if (Method == 2) {
-				Output->Text += "Steep Method" + Environment::NewLine;
-			}
-			else if (Method == 3) {
-				Output->Text += "Quasi Method" + Environment::NewLine;
 			}
 			else {
-				Output->Text += "Conjugate Method" + Environment::NewLine;
+				Output->Text += "Ever TextBox Should be Initial" + Environment::NewLine;
 			}
 		}
-		else {
-			Output->Text += "Ever TextBox Should be Initial" + Environment::NewLine;
+		catch (...) {
+			Output->Text += "Something Wrong in Initial Part"+ Environment::NewLine;
 		}
 	}
-};
+
+
+	};
 }

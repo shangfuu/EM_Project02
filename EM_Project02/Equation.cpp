@@ -110,7 +110,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, double tau)
 	if (abs(c - a) < tau * (abs(b) + abs(x))) {
 		return (c + a) / 2;
 	}
-	if (f(x) < f(b)) {
+	if (f(x, 0) < f(b,0)) {
 		if (c - b > b - a)	return goldenSectionSearch(b, x, c, tau);
 		else return goldenSectionSearch(a, x, b, tau);
 	}
@@ -118,11 +118,6 @@ double Equation::goldenSectionSearch(double a, double b, double c, double tau)
 		if (c - b > b - a) return goldenSectionSearch(a, b, x, tau);
 		else return goldenSectionSearch(x, b, c, tau);
 	}
-}
-
-double Equation::f(double x)
-{
-	return (f(x, 0));
 }
 
 double Equation::f(double x, double y) {
@@ -184,10 +179,10 @@ double Equation::f(double x, double y) {
 	}
 }
 
-double Equation::differentationX(double x, double y) {
+double Equation::dX(double x, double y) {
 	return ((f(x + threshold, y) - f(x - threshold, y)) / (2 * threshold));
 }
 
-double Equation::differentationY(double x, double y) {
+double Equation::dY(double x, double y) {
 	return ((f(x, y + threshold) - f(x, y - threshold)) / (2 * threshold));
 }

@@ -10,12 +10,12 @@ public:
 
 	/* Method */
 	double goldenSectionSearch(double, double, double, double);
-	double f(double);
 	double f(double, double);
-	double differentationX(double, double);
-	double differentationY(double, double);
+	double dX(double, double);
+	double dY(double, double);
 
 	/* Optimization Method */
+	void Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax);	// Example Call
 
 
 	/* Extra Method */
