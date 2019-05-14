@@ -645,7 +645,7 @@ namespace Optimization {
 				double xMax = double::Parse(MaxX->Text);
 				double yMax = double::Parse(MaxY->Text);
 
-				f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax);	// Example call;
+				f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax, Output);	// Example call;
 
 				/* TEST */
 				Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +

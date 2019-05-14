@@ -10,7 +10,8 @@
 class Vector
 {
 public:
-	Vector(); 
+	Vector();
+	Vector(double);
 	std::vector<double> Data;
 	int getDim() const {
 		return Data.size();

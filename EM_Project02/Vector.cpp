@@ -5,6 +5,11 @@ Vector::Vector()
 {
 }
 
+Vector::Vector(double d)
+{
+	this->Data.push_back(d);
+}
+
 Vector operator + (const Vector& x, const Vector& y) {
 	Vector buff;
 	for (int i = 0; i < x.Data.size(); i++) {
@@ -23,14 +28,23 @@ Vector operator - (const Vector& x, const Vector& y) {
 
 Vector operator *(const Vector& x, const Vector& y) {
 	Vector tmp;
-	double dot = 0;
-
-	for (int i = 0; i < x.Data.size(); i++) {
-		dot += (x.Data[i] * y.Data[i]);
+	
+	if (x.Data.size() == 1 || y.Data.size() == 1) {
+		tmp = Scalar(x,y);
 	}
-	tmp.Data.push_back(dot);
+	else {
+		double dot = 0;
+		for (int i = 0; i < x.Data.size(); i++) {
+			dot += (x.Data[i] * y.Data[i]);
+		}
+		tmp.Data.push_back(dot);
+	}
+
+	
 	return tmp;
 }
+
+
 
 Vector Scalar(const Vector& vec1, const Vector& vec2) {
 	Vector vec, scal;

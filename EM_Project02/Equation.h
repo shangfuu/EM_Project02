@@ -15,13 +15,14 @@ public:
 	/* Method */
 	double goldenSectionSearch(double, double, double, double);
 	double f(double, double);
+	double f(const Vector&);
 	double dX(double, double);
 	double dY(double, double);
-	friend Matrix Gradient(double, double, Equation);
-	friend Matrix Hessian(double, double, Equation);
+	Matrix Gradient(double, double);
+	Matrix Hessian(double, double);
 
 	/* Optimization Method */
-	void Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax);	// Example Call
+	void Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^);
 
 	/* Extra Method */
 	friend std::vector<std::string> postfix(std::string);	// postfix

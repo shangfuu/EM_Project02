@@ -196,6 +196,66 @@ double Equation::f(double x, double y) {
 	}
 }
 
+double Equation::f(const Vector& xy)
+{
+	std::vector<double> var;
+	double buff = 0;
+	std::string temp = "";
+	for (unsigned int i = 0; i < equation.size(); i++) {
+		if (equation[i] == "x") {
+			var.push_back(xy.Data[0]);
+		}
+		else if (equation[i] == "y") {
+			var.push_back(xy.Data[1]);
+		}
+		else if (equation[i] == "+") {
+			var[var.size() - 2] += var[var.size() - 1];
+			var.pop_back();
+		}
+		else if (equation[i] == "-") {
+			var[var.size() - 2] -= var[var.size() - 1];
+			var.pop_back();
+		}
+		else if (equation[i] == "*") {
+			var[var.size() - 2] *= var[var.size() - 1];
+			var.pop_back();
+		}
+		else if (equation[i] == "^") {
+			var[var.size() - 2] = pow(var[var.size() - 2], var[var.size() - 1]);
+			var.pop_back();
+		}
+		else if (equation[i] == "sin" || equation[i] == "cos" || equation[i] == "tan" || equation[i] == "sec" || equation[i] == "csc" || equation[i] == "cot") {
+			temp = equation[i];
+		}
+		else if (equation[i] == "$") {
+			if (temp == "sin") {
+				var[var.size() - 1] = sin(var[var.size() - 1]);
+			}
+			else if (temp == "cos") {
+				var[var.size() - 1] = cos(var[var.size() - 1]);
+			}
+			else if (temp == "tan") {
+				var[var.size() - 1] = tan(var[var.size() - 1]);
+			}
+			else if (temp == "sec") {
+				var[var.size() - 1] = 1 / cos(var[var.size() - 1]);
+			}
+			else if (temp == "csc") {
+				var[var.size() - 1] = 1 / sin(var[var.size() - 1]);
+			}
+			else if (temp == "cot") {
+				var[var.size() - 1] = 1 / tan(var[var.size() - 1]);
+			}
+		}
+		else {
+			var.push_back(stod(equation[i]));
+		}
+	}
+	if (var.size() == 1) {
+		return var[0];
+	}
+}
+
 double Equation::dX(double x, double y) {
 	return ((f(x + threshold, y) - f(x - threshold, y)) / (2 * threshold));
 }
@@ -204,25 +264,25 @@ double Equation::dY(double x, double y) {
 	return ((f(x, y + threshold) - f(x, y - threshold)) / (2 * threshold));
 }
 
-Matrix Gradient(double x, double y, Equation F)
+Matrix Equation::Gradient(double x, double y)
 {
 	Matrix gradient;
 
-	if (F.dim == 3) {	// XY
+	if (dim == 3) {	// XY
 		Vector dX, dY;
-		dX.Data.push_back(F.dX(x, y));
-		dY.Data.push_back(F.dY(x, y));
+		dX.Data.push_back(this->dX(x, y));
+		dY.Data.push_back(this->dY(x, y));
 		gradient.Data.push_back(dX);
 		gradient.Data.push_back(dY);
 	}
-	else if (F.dim == 2) {	// Y
+	else if (dim == 2) {	// Y
 		Vector dY;
-		dY.Data.push_back(F.dY(x, y));
+		dY.Data.push_back(this->dY(x, y));
 		gradient.Data.push_back(dY);
 	}
-	else if (F.dim == 1) {	// X
+	else if (dim == 1) {	// X
 		Vector dX;
-		dX.Data.push_back(F.dX(x, y));
+		dX.Data.push_back(this->dX(x, y));
 		gradient.Data.push_back(dX);
 	}
 	else {	// No X Y
@@ -234,17 +294,17 @@ Matrix Gradient(double x, double y, Equation F)
 	return gradient;
 }
 
-Matrix Hessian(double x, double y, Equation F)
+Matrix Equation::Hessian(double x, double y)
 {
 	Matrix hessian;
 
-	if (F.dim == 3) {	// XY
+	if (dim == 3) {	// XY
 		double dXX = 0, dYX = 0, dXY = 0, dYY = 0;
 		Vector row1, row2;
-		dXX = (F.dX(x + threshold, y) - F.dX(x - threshold, y)) / (2 * threshold);
-		dYX = (F.dY(x + threshold, y) - F.dY(x - threshold, y)) / (2 * threshold);
-		dXY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
-		dYY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
+		dXX = (dX(x + threshold, y) - dX(x - threshold, y)) / (2 * threshold);
+		dYX = (dY(x + threshold, y) - dY(x - threshold, y)) / (2 * threshold);
+		dXY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
+		dYY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
 		row1.Data.push_back(dXX);
 		row1.Data.push_back(dYX);
 		row2.Data.push_back(dXY);
@@ -252,17 +312,17 @@ Matrix Hessian(double x, double y, Equation F)
 		hessian.Data.push_back(row1);
 		hessian.Data.push_back(row2);
 	}
-	else if (F.dim == 2) {	// Y
+	else if (dim == 2) {	// Y
 		Vector row1;
 		double dYY = 0;
-		dYY = (F.dX(x, y + threshold) - F.dX(x, y - threshold)) / (2 * threshold);
+		dYY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
 		row1.Data.push_back(dYY);
 		hessian.Data.push_back(row1);
 	}
-	else if (F.dim == 1) {	// X
+	else if (dim == 1) {	// X
 		Vector row1;
 		double dXX = 0;
-		dXX = (F.dX(x + threshold, y) - F.dX(x - threshold, y)) / (2 * threshold);
+		dXX = (dX(x + threshold, y) - dX(x - threshold, y)) / (2 * threshold);
 		row1.Data.push_back(dXX);
 		hessian.Data.push_back(row1);
 	}
@@ -275,9 +335,39 @@ Matrix Hessian(double x, double y, Equation F)
 	return hessian;
 }
 
-void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax)
+void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^ Output)
 {
+	double Precision = 0.0001;
+	int Max_iter = 500;
 
+	// double next_x = x, now_x = x;
+	Vector next_x(x), now_x(x);
+	next_x.Data.push_back(y);
+	now_x.Data.push_back(y);
+
+	// step 0
+	int k = 0;
+	
+
+	while (Max_iter-- < 0) {
+		Vector gradient = Gradient(x, y).Data[0];	// Matrix to Vector
+
+		// step 1: Stopping criteria
+		if (Norm(gradient) <= Precision || abs(Norm(next_x - now_x)) <= Precision || f(next_x) > f(now_x) ) {
+			break;
+		}
+
+		// step 2 : compute step-size lambda: using backtracking
+		Vector lambda(1);	// size always 1 equals double
+		double c = 0.001;
+		while (f(now_x - lambda*gradient) > f(now_x) - c * lambda.Data[0] * pow(Norm(gradient),2)) {
+			lambda.Data[0] = lambda.Data[0] * 0.5;
+		}
+		now_x = next_x;
+		// step 3
+		next_x = now_x - lambda * gradient;
+		k++;
+	}
 
 
 }
