@@ -418,6 +418,7 @@ namespace Optimization {
 			this->EquBox->Multiline = true;
 			this->EquBox->Name = L"EquBox";
 			this->EquBox->ReadOnly = true;
+			this->EquBox->ScrollBars = System::Windows::Forms::ScrollBars::Both;
 			this->EquBox->Size = System::Drawing::Size(474, 209);
 			this->EquBox->TabIndex = 11;
 			// 
@@ -446,6 +447,7 @@ namespace Optimization {
 			this->Output->Multiline = true;
 			this->Output->Name = L"Output";
 			this->Output->ReadOnly = true;
+			this->Output->ScrollBars = System::Windows::Forms::ScrollBars::Both;
 			this->Output->Size = System::Drawing::Size(475, 613);
 			this->Output->TabIndex = 3;
 			// 
@@ -550,7 +552,7 @@ namespace Optimization {
 					if (k < equations.size() && k >= 0) {
 						UseEquation = gcnew String(equations[k].c_str());
 						FunctionIndex = k;
-						Output->Text += UseEquation + Environment::NewLine;
+						Output->Text += "**  Using  " + FunctionIndex.ToString() + ":  " + UseEquation + "  **" + Environment::NewLine;
 					}
 					else if (equations.size() == 0) {
 						Output->Text += "Please Load Equation File First" + Environment::NewLine;
@@ -653,9 +655,6 @@ namespace Optimization {
 					Output->Text += "Foolish Interval and Initial" + Environment::NewLine;
 				}
 				else {
-					/* TEST */
-					Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +
-						MaxY->Text + Environment::NewLine;
 
 					if (Method == 0) {
 						Output->Text += "Powell¡¦s Method" + Environment::NewLine;

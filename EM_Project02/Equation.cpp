@@ -387,7 +387,7 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 			gradient = -1 * gradient;
 		}
 		pre_x = now_x;
-		
+
 		// step 2 : compute step-size lambda
 		Matrix L = G * Transpose(G) * Inverse(G * Hessian(pre_x) * Transpose(G));
 
@@ -397,11 +397,6 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 		// step 3
 		now_x = pre_x + step;
 
-		// step 1: Stopping criteria
-		if (Norm(gradient) <= Precision || abs(Norm(pre_x - now_x)) <= Precision || f(pre_x) <= f(now_x) ) {
-			break;
-		}
-
 		// Edge Dealing
 		for (int i = 0; i < now_x.getDim(); i++) {
 			while (now_x.Data[i] > Max_X.Data[i] || now_x.Data[i] < Min_X.Data[i]) {
@@ -410,32 +405,46 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 			}
 		}
 
+		// step 1: Stopping criteria
+		if (Norm(gradient) <= Precision || abs(Norm(pre_x - now_x)) <= Precision || f(pre_x) <= f(now_x)) {
+			break;
+		}
 
 		// step 4 : output
 		k++;
-		//pre_x = now_x;
 
-		// print
+		/* Form print */
+		// i
+		Output->Text += "i = " + k.ToString() + System::Environment::NewLine;
+		// h
+		Output->Text += "h =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < gradient.getDim(); i++)
+			Output->Text += gradient.Data[i].ToString() + System::Environment::NewLine;
+		Output->Text += "]" + System::Environment::NewLine;
+		// lambda
+		Output->Text += "lambda = " + lambda.Data[0].ToString() + System::Environment::NewLine;
+		// x
+		Output->Text += "X =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < now_x.getDim(); i++)
+			Output->Text += now_x.Data[i].ToString() + System::Environment::NewLine;
+		Output->Text += " ]" + System::Environment::NewLine + System::Environment::NewLine;
+
+		/* std print */
 		std::cout << k << std::endl;
-		// print
 		for (int i = 0; i < gradient.getDim(); i++) {
 			std::cout << "h = " << gradient.Data[i] << std::endl;
 		}
-		// print
-		for (int i = 0; i < lambda.getDim(); i++) {
-			std::cout << "Lambda = " << lambda.Data[i] << std::endl;
-		}
-		// print
+		std::cout << "Lambda = " << lambda.Data[0] << std::endl;
 		for (int i = 0; i < now_x.getDim(); i++) {
 			std::cout << "X = " << now_x.Data[i] << std::endl;
 		}
-
 	}
 
-	Output->Text += k.ToString() + System::Environment::NewLine;
+
+	Output->Text += "[";
 	for (int i = 0; i < pre_x.getDim(); i++) {
-		Output->Text += pre_x.Data[i].ToString() + ",";
+		Output->Text += pre_x.Data[i].ToString() + " , ";
 	}
-	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine;
-
+	Output->Text += "]" + System::Environment::NewLine;
+	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
 }

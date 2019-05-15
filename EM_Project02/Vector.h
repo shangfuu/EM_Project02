@@ -26,7 +26,7 @@ public:
 	friend Vector operator+(const Vector&, const Vector&);
 	friend Vector operator-(const Vector&, const Vector&);
 	friend Vector operator*(const Vector&, const Vector&);  // Dot
-	friend Vector operator*(const double&, const Vector&);  // Dot
+	friend Vector operator*(const double&, const Vector&);  // Scalar
 
 	/* Method */
 	friend Vector Scalar(const Vector&, const Vector&);
