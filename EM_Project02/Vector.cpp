@@ -5,9 +5,23 @@ Vector::Vector()
 {
 }
 
-Vector::Vector(double d)
+Vector::Vector(double v)
 {
-	this->Data.push_back(d);
+	this->initial(v);
+}
+
+Vector::Vector(double x, double y)
+{
+	this->initial(x,y);
+}
+
+void Vector::initial(double x) {
+	this->Data.push_back(x);
+}
+
+void Vector::initial(double x, double y) {
+	this->Data.push_back(x);
+	this->Data.push_back(y);
 }
 
 Vector operator + (const Vector& x, const Vector& y) {
@@ -41,6 +55,15 @@ Vector operator *(const Vector& x, const Vector& y) {
 	}
 
 	
+	return tmp;
+}
+
+Vector operator*(const double &num, const Vector &v)
+{
+	Vector tmp;
+	for (int i = 0; i < v.getDim(); i++) {
+		tmp.Data.push_back(num*v.Data[i]);
+	}
 	return tmp;
 }
 

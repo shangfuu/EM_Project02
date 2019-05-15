@@ -11,16 +11,22 @@ class Vector
 {
 public:
 	Vector();
-	Vector(double);
+	Vector(double);	// initial data x
+	Vector(double, double); // initial data x y
+
 	std::vector<double> Data;
 	int getDim() const {
 		return Data.size();
 	}
 
+	void initial(double x, double y);	// initial data
+	void initial(double x);		// initial data
+
 	/* Operator Overloading */
 	friend Vector operator+(const Vector&, const Vector&);
 	friend Vector operator-(const Vector&, const Vector&);
 	friend Vector operator*(const Vector&, const Vector&);  // Dot
+	friend Vector operator*(const double&, const Vector&);  // Dot
 
 	/* Method */
 	friend Vector Scalar(const Vector&, const Vector&);

@@ -106,10 +106,18 @@ void Equation::SetEquation(std::vector<std::string>equ)
 		if (meetX && meetY) break; // Terminate Earlier if meet both XY
 	}
 
-	if (meetX && meetY)	dim = 3;
-	else if (meetY) dim = 2;
-	else if (meetX) dim = 1;
-	else dim = 0;	// No meet
+	if (meetX && meetY) {
+		dim = 3;
+	}
+	else if (meetY) {
+		dim = 2;
+	}
+	else if (meetX) {
+		dim = 1;
+	}
+	else { // No meet
+		dim = 0;
+	}
 }
 
 double Equation::goldenSectionSearch(double a, double b, double c, double tau)
@@ -257,54 +265,49 @@ double Equation::f(const Vector& xy)
 }
 
 double Equation::dX(double x, double y) {
-	return ((f(x + threshold, y) - f(x - threshold, y)) / (2 * threshold));
+	double f1 = f(x + threshold, y);
+	double f2 = f(x - threshold, y);
+	double d = (f1 - f2) / (2 * threshold);
+
+	return d;
+	// return ((f(x + threshold, y) - f(x - threshold, y)) / (2 * threshold));
 }
 
 double Equation::dY(double x, double y) {
 	return ((f(x, y + threshold) - f(x, y - threshold)) / (2 * threshold));
 }
 
-Matrix Equation::Gradient(double x, double y)
+Matrix Equation::Gradient(const Vector& X)
 {
 	Matrix gradient;
+	Vector d;
 
 	if (dim == 3) {	// XY
-		Vector dX, dY;
-		dX.Data.push_back(this->dX(x, y));
-		dY.Data.push_back(this->dY(x, y));
-		gradient.Data.push_back(dX);
-		gradient.Data.push_back(dY);
+		d.Data.push_back(this->dX(X.Data[0], X.Data[1]));
+		d.Data.push_back(this->dY(X.Data[0], X.Data[1]));
 	}
 	else if (dim == 2) {	// Y
-		Vector dY;
-		dY.Data.push_back(this->dY(x, y));
-		gradient.Data.push_back(dY);
+		d.Data.push_back(this->dY(0, X.Data[0]));
 	}
 	else if (dim == 1) {	// X
-		Vector dX;
-		dX.Data.push_back(this->dX(x, y));
-		gradient.Data.push_back(dX);
-	}
-	else {	// No X Y
-		Vector Zero;
-		Zero.Data.push_back(0);
-		gradient.Data.push_back(Zero);
+		d.Data.push_back(this->dX(X.Data[0], 0));
 	}
 
+	gradient.Data.push_back(d);
 	return gradient;
 }
 
-Matrix Equation::Hessian(double x, double y)
+Matrix Equation::Hessian(const Vector& X)
 {
 	Matrix hessian;
 
 	if (dim == 3) {	// XY
 		double dXX = 0, dYX = 0, dXY = 0, dYY = 0;
 		Vector row1, row2;
-		dXX = (dX(x + threshold, y) - dX(x - threshold, y)) / (2 * threshold);
-		dYX = (dY(x + threshold, y) - dY(x - threshold, y)) / (2 * threshold);
-		dXY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
-		dYY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
+		dXX = (dX(X.Data[0] + threshold, X.Data[1]) - dX(X.Data[0] - threshold, X.Data[1])) / (2 * threshold);
+		dYX = (dY(X.Data[0] + threshold, X.Data[1]) - dY(X.Data[0] - threshold, X.Data[1])) / (2 * threshold);
+		dXY = (dX(X.Data[0], X.Data[1] + threshold) - dX(X.Data[0], X.Data[1] - threshold)) / (2 * threshold);
+		dYY = (dY(X.Data[0], X.Data[1] + threshold) - dY(X.Data[0], X.Data[1] - threshold)) / (2 * threshold);
 		row1.Data.push_back(dXX);
 		row1.Data.push_back(dYX);
 		row2.Data.push_back(dXY);
@@ -315,21 +318,16 @@ Matrix Equation::Hessian(double x, double y)
 	else if (dim == 2) {	// Y
 		Vector row1;
 		double dYY = 0;
-		dYY = (dX(x, y + threshold) - dX(x, y - threshold)) / (2 * threshold);
+		dYY = (dY(0, X.Data[0] + threshold) - dY(0, X.Data[0] - threshold)) / (2 * threshold);
 		row1.Data.push_back(dYY);
 		hessian.Data.push_back(row1);
 	}
 	else if (dim == 1) {	// X
 		Vector row1;
 		double dXX = 0;
-		dXX = (dX(x + threshold, y) - dX(x - threshold, y)) / (2 * threshold);
+		dXX = (dX(X.Data[0] + threshold, 0) - dX(X.Data[0] - threshold, 0)) / (2 * threshold);
 		row1.Data.push_back(dXX);
 		hessian.Data.push_back(row1);
-	}
-	else {
-		Vector Zero;
-		Zero.Data.push_back(0);
-		hessian.Data.push_back(Zero);
 	}
 
 	return hessian;
@@ -337,37 +335,107 @@ Matrix Equation::Hessian(double x, double y)
 
 void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^ Output)
 {
-	double Precision = 0.0001;
+	double Precision = 0.001;
 	int Max_iter = 500;
 
-	// double next_x = x, now_x = x;
-	Vector next_x(x), now_x(x);
-	next_x.Data.push_back(y);
-	now_x.Data.push_back(y);
+	// Initial X Vector and Internal Vector
+	Vector Max_X, Min_X;
+	if (dim == 3) {
+		X.initial(x, y);
+		Max_X.initial(xMax, yMax);
+		Min_X.initial(xMin, yMin);
+	}
+	else if (dim == 2) {
+		X.initial(y);
+		Max_X.initial(yMax);
+		Min_X.initial(yMin);
+	}
+	else if (dim == 1) {
+		X.initial(x);
+		Max_X.initial(xMax);
+		Min_X.initial(xMin);
+	}
+
+	Vector pre_x = X, now_x = X;
+	Vector step;
 
 	// step 0
 	int k = 0;
-	
+	while (Max_iter-- > 0) {
 
-	while (Max_iter-- < 0) {
-		Vector gradient = Gradient(x, y).Data[0];	// Matrix to Vector
+		// step 1
+		Matrix G = Gradient(now_x);
+		Vector gradient = G.Data[0];	// Matrix to Vector
+
+		if (Norm(gradient) == 0) {
+			break;
+		}
+		gradient = -1 * gradient;
+
+		// Not A Number Happened
+		while (isnan(gradient.Data[0])) {
+			std::cout << " Test ----------------------" << std::endl;
+			std::cout << "G = " << gradient.Data[0] << std::endl;
+			std::cout << "step = " << step.Data[0] << std::endl;
+			step = 0.9 * step;
+			std::cout << "step = " << step.Data[0] << std::endl;
+			now_x = pre_x + step;
+			std::cout << "x = " << now_x.Data[0] << std::endl;
+
+			G = Gradient(now_x);
+			gradient = G.Data[0];
+			gradient = -1 * gradient;
+		}
+		pre_x = now_x;
+		
+		// step 2 : compute step-size lambda
+		Matrix L = G * Transpose(G) * Inverse(G * Hessian(pre_x) * Transpose(G));
+
+		Vector lambda = L.Data[0];
+		step = lambda * gradient;
+
+		// step 3
+		now_x = pre_x + step;
 
 		// step 1: Stopping criteria
-		if (Norm(gradient) <= Precision || abs(Norm(next_x - now_x)) <= Precision || f(next_x) > f(now_x) ) {
+		if (Norm(gradient) <= Precision || abs(Norm(pre_x - now_x)) <= Precision || f(pre_x) <= f(now_x) ) {
 			break;
 		}
 
-		// step 2 : compute step-size lambda: using backtracking
-		Vector lambda(1);	// size always 1 equals double
-		double c = 0.001;
-		while (f(now_x - lambda*gradient) > f(now_x) - c * lambda.Data[0] * pow(Norm(gradient),2)) {
-			lambda.Data[0] = lambda.Data[0] * 0.5;
+		// Edge Dealing
+		for (int i = 0; i < now_x.getDim(); i++) {
+			while (now_x.Data[i] > Max_X.Data[i] || now_x.Data[i] < Min_X.Data[i]) {
+				step = 0.9 * step;
+				now_x = pre_x + step;
+			}
 		}
-		now_x = next_x;
-		// step 3
-		next_x = now_x - lambda * gradient;
+
+
+		// step 4 : output
 		k++;
+		//pre_x = now_x;
+
+		// print
+		std::cout << k << std::endl;
+		// print
+		for (int i = 0; i < gradient.getDim(); i++) {
+			std::cout << "h = " << gradient.Data[i] << std::endl;
+		}
+		// print
+		for (int i = 0; i < lambda.getDim(); i++) {
+			std::cout << "Lambda = " << lambda.Data[i] << std::endl;
+		}
+		// print
+		for (int i = 0; i < now_x.getDim(); i++) {
+			std::cout << "X = " << now_x.Data[i] << std::endl;
+		}
+
 	}
 
+	Output->Text += k.ToString() + System::Environment::NewLine;
+	for (int i = 0; i < pre_x.getDim(); i++) {
+		Output->Text += pre_x.Data[i].ToString() + ",";
+	}
+	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine;
 
 }

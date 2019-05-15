@@ -550,6 +550,7 @@ namespace Optimization {
 					if (k < equations.size() && k >= 0) {
 						UseEquation = gcnew String(equations[k].c_str());
 						FunctionIndex = k;
+						Output->Text += UseEquation + Environment::NewLine;
 					}
 					else if (equations.size() == 0) {
 						Output->Text += "Please Load Equation File First" + Environment::NewLine;
@@ -645,29 +646,34 @@ namespace Optimization {
 				double xMax = double::Parse(MaxX->Text);
 				double yMax = double::Parse(MaxY->Text);
 
-				f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax, Output);	// Example call;
-
-				/* TEST */
-				Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +
-					MaxY->Text + Environment::NewLine;
-
-
-				if (Method == 0) {
-					Output->Text += "Powell¡¦s Method" + Environment::NewLine;
+				if (xMin > xMax || yMin > yMax) {
+					Output->Text += "Min must Smaller than Max" + Environment::NewLine;
 				}
-				else if (Method == 1) {
-					Output->Text += "Newton Method" + Environment::NewLine;
-				}
-				else if (Method == 2) {
-					Output->Text += "Steep Method" + Environment::NewLine;
-				}
-				else if (Method == 3) {
-					Output->Text += "Quasi Method" + Environment::NewLine;
+				else if (x < xMin || x > xMax || y < yMin || y > yMax) {
+					Output->Text += "Foolish Interval and Initial" + Environment::NewLine;
 				}
 				else {
-					Output->Text += "Conjugate Method" + Environment::NewLine;
-				}
+					/* TEST */
+					Output->Text += IniX->Text + " " + IniY->Text + " " + MinX->Text + " ~ " + MaxX->Text + " " + MinY->Text + " ~ " +
+						MaxY->Text + Environment::NewLine;
 
+					if (Method == 0) {
+						Output->Text += "Powell¡¦s Method" + Environment::NewLine;
+					}
+					else if (Method == 1) {
+						Output->Text += "Newton Method" + Environment::NewLine;
+					}
+					else if (Method == 2) {
+						Output->Text += "Steep Method" + Environment::NewLine;
+						f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax, Output);	// Example call;
+					}
+					else if (Method == 3) {
+						Output->Text += "Quasi Method" + Environment::NewLine;
+					}
+					else {
+						Output->Text += "Conjugate Method" + Environment::NewLine;
+					}
+				}
 			}
 			else {
 				Output->Text += "Every TextBox Should be Initial" + Environment::NewLine;
