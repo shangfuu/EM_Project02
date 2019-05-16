@@ -755,10 +755,6 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 		Matrix G = Gradient(now_x);
 		Vector gradient = G.Data[0];	// Matrix to Vector
 
-		if (Norm(gradient) == 0) {
-			break;
-		}
-
 		// Not A Number Happened
 		while (isnan(gradient.Data[0])) {
 			std::cout << " Test ----------------------" << std::endl;
