@@ -658,6 +658,7 @@ namespace Optimization {
 
 					if (Method == 0) {
 						Output->Text += "Powell¡¦s Method" + Environment::NewLine;
+						f.Powell(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 					else if (Method == 1) {
 						Output->Text += "Newton Method" + Environment::NewLine;

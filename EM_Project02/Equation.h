@@ -6,7 +6,7 @@
 #include "Matrix.h"
 #define threshold 10E-7
 #define tau 1E-5
-
+#define resphi (2 - ((1 + sqrt(5)) / 2))
 class Equation {
 public:	
 
@@ -38,4 +38,3 @@ public:
 
 int priority(char);
 double compare(double max, double min, double x);
-double resphi = 2 - ((1 + sqrt(5)) / 2);
