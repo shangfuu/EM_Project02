@@ -784,7 +784,7 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 		now_x = pre_x - step;
 
 		// Stopping Criteria
-		if (abs(Norm(now_x - pre_x)) <= Precision || Norm(gradient) <= Precision) {
+		if (abs(Norm(now_x - pre_x)) <= Precision) {
 			break;
 		}
 
