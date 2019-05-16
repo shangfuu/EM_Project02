@@ -669,6 +669,7 @@ namespace Optimization {
 					}
 					else if (Method == 3) {
 						Output->Text += "Quasi Method" + Environment::NewLine;
+						f.Quasi_Newton(x, y, Output);
 					}
 					else {
 						Output->Text += "Conjugate Method" + Environment::NewLine;

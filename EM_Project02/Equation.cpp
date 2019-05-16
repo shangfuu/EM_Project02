@@ -842,3 +842,8 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 	Output->Text += "]" + System::Environment::NewLine;
 	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
 }
+
+void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox ^)
+{
+}
+
