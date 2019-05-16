@@ -162,7 +162,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, Vector S) {
 		fx = f(this->X.Data[0] + x * S.Data[0], 0);
 		fb = f(this->X.Data[0] + b * S.Data[0], 0);
 	}
-	else if(dim == 2) {
+	else if (dim == 2) {
 		fx = f(0, this->X.Data[1] + x * S.Data[1]);
 		fb = f(0, this->X.Data[1] + b * S.Data[1]);
 	}
@@ -688,7 +688,7 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 		}
 
 		// step 1: Stopping criteria
-		if (Norm(gradient) <= Precision || abs(Norm(pre_x - now_x)) <= Precision || f(pre_x) <= f(now_x)) {
+		if (Norm(gradient) <= Precision || abs(Norm(pre_x - now_x)) <= Precision) {
 			break;
 		}
 
@@ -722,6 +722,122 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 		}
 	}
 
+
+	Output->Text += "[";
+	for (int i = 0; i < pre_x.getDim(); i++) {
+		Output->Text += pre_x.Data[i].ToString() + " , ";
+	}
+	Output->Text += "]" + System::Environment::NewLine;
+	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
+}
+
+void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
+{
+	double Precision = 0.001;
+	int Max_iter = 500;
+
+	if (dim == 3) {
+		X.initial(x, y);
+	}
+	else if (dim == 2) {
+		X.initial(y);
+	}
+	else if (dim == 1) {
+		X.initial(x);
+	}
+	Vector pre_x = X, now_x = X;
+	Vector step;
+
+	int k = 0;
+	while (Max_iter-- > 0) {
+
+		// Gradient
+		Matrix G = Gradient(now_x);
+		Vector gradient = G.Data[0];	// Matrix to Vector
+
+		if (Norm(gradient) == 0) {
+			break;
+		}
+
+		// Not A Number Happened
+		while (isnan(gradient.Data[0])) {
+			std::cout << " Test ----------------------" << std::endl;
+			std::cout << "G = " << gradient.Data[0] << std::endl;
+			std::cout << "step = " << step.Data[0] << std::endl;
+			step = 0.9 * step;
+			std::cout << "step = " << step.Data[0] << std::endl;
+			now_x = pre_x + step;
+			std::cout << "x = " << now_x.Data[0] << std::endl;
+
+			G = Gradient(now_x);
+			gradient = G.Data[0];
+			gradient = -1 * gradient;
+		}
+		pre_x = now_x;
+
+		// Step
+		Matrix H = Hessian(now_x);	// Hessian
+		Matrix InvH = Inverse(H);	// Inverse Hessian
+		Matrix S = G * InvH;
+		step = S.Data[0];
+
+		now_x = pre_x - step;
+
+		// Stopping Criteria
+		if (abs(Norm(now_x - pre_x)) <= Precision || Norm(gradient) <= Precision) {
+			break;
+		}
+
+		k++;
+
+
+		/* Form print*/
+		// i
+		Output->Text += "i = " + k.ToString() + System::Environment::NewLine;
+		// hessian
+		Output->Text += "Hessian =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < H.getRow(); i++) {
+			for (int j = 0; j < H.getCol(); j++) {
+				Output->Text += H.Data[i].Data[j].ToString() + ", ";
+			}
+			Output->Text += System::Environment::NewLine;
+		}
+		Output->Text += "]" + System::Environment::NewLine;
+		// hessian inverse
+		Output->Text += "Hessian Inverse =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < InvH.getRow(); i++) {
+			for (int j = 0; j < InvH.getCol(); j++) {
+				Output->Text += InvH.Data[i].Data[j].ToString() + ", ";
+			}
+			Output->Text += System::Environment::NewLine;
+		}
+		Output->Text += "]" + System::Environment::NewLine;
+		// x
+		Output->Text += "X =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < now_x.getDim(); i++)
+			Output->Text += now_x.Data[i].ToString() + System::Environment::NewLine;
+		Output->Text += " ]" + System::Environment::NewLine + System::Environment::NewLine;
+
+		/* std print */
+		std::cout << k << std::endl;
+		std::cout << "Hessian = ";
+		for (int i = 0; i < H.getRow(); i++) {
+			for (int j = 0; j < H.getCol(); j++) {
+				std::cout << H.Data[i].Data[j] << ", ";
+			}
+			std::cout << std::endl;
+		}
+		std::cout << "Hessian Inverse = ";
+		for (int i = 0; i < InvH.getRow(); i++) {
+			for (int j = 0; j < InvH.getCol(); j++) {
+				std::cout << InvH.Data[i].Data[j] << ", ";
+			}
+			std::cout << std::endl;
+		}
+		for (int i = 0; i < now_x.getDim(); i++) {
+			std::cout << "X = " << now_x.Data[i] << std::endl;
+		}
+	}
 
 	Output->Text += "[";
 	for (int i = 0; i < pre_x.getDim(); i++) {

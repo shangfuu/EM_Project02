@@ -158,17 +158,3 @@ double Angle(const Vector& x, const Vector& y) {
 	double cosv = XdotY / (Norm(x) * Norm(y));
 	return (acos(cosv) * 180 / PI);
 }
-
-std::vector<Vector> Ob(const std::vector<Vector>& x) {
-	std::vector<Vector> buff;
-	buff.push_back(Normal(x[0]));
-
-	for (int i = 1; i < x.size(); i++) {
-		Vector temp = x[i];
-		for (int j = 0; j < i; j++) {
-			temp = temp - Proj(temp, buff[j]);
-		}
-		buff.push_back(Normal(temp));
-	}
-	return buff;
-}

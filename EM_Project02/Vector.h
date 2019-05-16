@@ -41,6 +41,5 @@ public:
 	friend bool IsParal(const Vector&, const Vector&);		// Parallrl Judge
 	friend bool IsOrthog(const Vector&, const Vector&);		// Orthogonal Judge
 	friend double Angle(const Vector&, const Vector&);
-	friend std::vector<Vector> Ob(const std::vector<Vector>&);		// Gram¡VSchmidt Orthogonalization Process
 };
 

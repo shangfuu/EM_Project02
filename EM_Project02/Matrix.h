@@ -32,19 +32,10 @@ public:
 	/* Method */
 	int Rank() const;		// nonZero rows
 
-	friend Matrix Copy(const Matrix&);
 	friend Matrix Transpose(const Matrix&);
 	friend Matrix Inverse(const Matrix&);
-	friend Matrix Solve_Linear_System(const Matrix&, const Matrix&);
 	friend double Determinant(const Matrix&);
 	friend  Matrix Adjoint(const Matrix&);
-	friend Vector FindK(const Matrix&, int);	// Eigen used
-	friend  Matrix Eigen(const Matrix&);
-	friend std::vector<Vector> Power_Method(const Matrix&);
-	friend Matrix LeastSquare(const Matrix&, const Matrix &);
 	// 最後一筆測資
 	friend Matrix U_Triangle(const Matrix&);
-	
-	// Vector用
-	friend bool IsLI(const Matrix&);		// Linear Independent Judge
 };

@@ -651,17 +651,17 @@ namespace Optimization {
 				if (xMin > xMax || yMin > yMax) {
 					Output->Text += "Min must Smaller than Max" + Environment::NewLine;
 				}
-				else if (x < xMin || x > xMax || y < yMin || y > yMax) {
+				else if ((x < xMin || x > xMax || y < yMin || y > yMax) && Method != 1 && Method != 3) {
 					Output->Text += "Foolish Interval and Initial" + Environment::NewLine;
 				}
 				else {
-
 					if (Method == 0) {
 						Output->Text += "Powell¡¦s Method" + Environment::NewLine;
 						f.Powell(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 					else if (Method == 1) {
 						Output->Text += "Newton Method" + Environment::NewLine;
+						f.Newton(x, y, Output);
 					}
 					else if (Method == 2) {
 						Output->Text += "Steep Method" + Environment::NewLine;
