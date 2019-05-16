@@ -76,6 +76,20 @@ std::vector<std::string> postfix(std::string str) {
 	return postfix;
 }
 
+std::vector<double> Equation::sorting(std::vector<double> v) {
+	double temp;
+	for (unsigned int i = 0; i < v.size(); i++) {
+		for (unsigned int j = i + 1; j < v.size(); j++) {
+			if (v[j] < v[i]) {
+				temp = v[j];
+				v[j] = v[i];
+				v[i] = temp;
+			}
+		}
+	}
+	return v;
+}
+
 int priority(char op) {
 	switch (op) {
 	case'$':
@@ -88,6 +102,18 @@ int priority(char op) {
 		return 1;
 	default:
 		return 0;
+	}
+}
+
+double compare(double max, double min, double x) {
+	if (x > max) {
+		return max;
+	}
+	else if (x < min) {
+		return min;
+	}
+	else {
+		return x;
 	}
 }
 
@@ -120,28 +146,37 @@ void Equation::SetEquation(std::vector<std::string>equ)
 	}
 }
 
-double Equation::goldenSectionSearch(double a, double b, double c, double tau)
-{
+double Equation::goldenSectionSearch(double a, double b, double c, Vector S) {
 	double x;
-	double resphi = 2 - ((1 + sqrt(5)) / 2);
-
 	if (c - b > b - a) {
 		x = b + resphi * (c - b);
 	}
 	else {
 		x = b - resphi * (b - a);
 	}
-
 	if (abs(c - a) < tau * (abs(b) + abs(x))) {
 		return (c + a) / 2;
 	}
-	if (f(x, 0) < f(b, 0)) {
-		if (c - b > b - a)	return goldenSectionSearch(b, x, c, tau);
-		else return goldenSectionSearch(a, x, b, tau);
+	double fx, fb;
+	if (dim == 1) {
+		fx = f(this->X.Data[0] + x * S.Data[0], 0);
+		fb = f(this->X.Data[0] + b * S.Data[0], 0);
+	}
+	else if(dim == 2) {
+		fx = f(0, this->X.Data[1] + x * S.Data[1]);
+		fb = f(0, this->X.Data[1] + b * S.Data[1]);
 	}
 	else {
-		if (c - b > b - a) return goldenSectionSearch(a, b, x, tau);
-		else return goldenSectionSearch(x, b, c, tau);
+		fb = f(this->X.Data[0] + b * S.Data[0], this->X.Data[1] + b * S.Data[1]);
+		fx = f(this->X.Data[0] + x * S.Data[0], this->X.Data[1] + x * S.Data[1]);
+	}
+	if (fx < fb) {
+		if (c - b > b - a) return goldenSectionSearch(b, x, c, S);
+		else return goldenSectionSearch(a, x, b, S);
+	}
+	else {
+		if (c - b > b - a) return goldenSectionSearch(a, b, x, S);
+		else return goldenSectionSearch(x, b, c, S);
 	}
 }
 
@@ -331,6 +366,253 @@ Matrix Equation::Hessian(const Vector& X)
 	}
 
 	return hessian;
+}
+
+void Equation::Powell(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox ^ Output)
+{
+	int i = 1, j = 1;
+	std::vector<Vector> S;
+
+	if (dim == 1) {
+		this->X.Data.push_back(x);
+		this->X.Data.push_back(0);
+		Vector temp;
+		// S1
+		temp.Data.push_back(1);
+		temp.Data.push_back(0);
+		S.push_back(temp);
+		temp.Data.clear();
+		// S2
+		temp.Data.push_back(0);
+		temp.Data.push_back(0);
+		S.push_back(temp);
+		temp.Data.clear();
+		double x2, GSmin, GSmax;
+		double alpha1, alpha2;
+		int cnt = 0;
+		for (;;) {
+			Output->Text += "j = " + j + System::Environment::NewLine;
+			if (j != 1) {
+				S[0].Data[0] = S[1].Data[0];
+			}
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X1 = [ " + this->X.Data[0] + " ]" + System::Environment::NewLine;
+			GSmax = (xMax - this->X.Data[0]) / S[0].Data[0];
+			GSmin = (xMin - this->X.Data[0]) / S[0].Data[0];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			alpha1 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[0]);
+			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
+			x2 = this->X.Data[0] + alpha1 * S[0].Data[0];
+			x2 = compare(xMax, xMin, x2);
+			this->X.Data[0] = x2;
+			Output->Text += "X2 = [ " + this->X.Data[0] + " ]" + System::Environment::NewLine;
+			++i;
+			S[1].Data[0] = alpha1 * S[0].Data[0];
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X2 = [ " + this->X.Data[0] + " ]" + System::Environment::NewLine;
+			GSmax = (xMax - this->X.Data[0]) / S[1].Data[0];
+			GSmin = (xMin - this->X.Data[0]) / S[1].Data[0];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			alpha2 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[1]);
+			Output->Text += "alpha = " + alpha2 + System::Environment::NewLine;
+			x2 = this->X.Data[0] + alpha2 * S[1].Data[0];
+			x2 = compare(xMax, xMin, x2);
+			Output->Text += "S2 = [ " + S[1].Data[0] + " ]" + System::Environment::NewLine;
+			Output->Text += "X3 = [ " + x2 + " ]" + System::Environment::NewLine;
+			if (abs(x2 - this->X.Data[0]) < threshold) break;
+			this->X.Data[0] = x2;
+			i = 1;
+			++j;
+		}
+		Output->Text += "X = [ " + x2 + " ]" + System::Environment::NewLine;
+		Output->Text += "min = " + f(x2, 0) + System::Environment::NewLine;
+	}
+	else if (dim == 2) {
+		this->X.Data.push_back(0);
+		this->X.Data.push_back(y);
+		Vector temp;
+		// S1
+		temp.Data.push_back(0);
+		temp.Data.push_back(1);
+		S.push_back(temp);
+		temp.Data.clear();
+		// S2
+		temp.Data.push_back(0);
+		temp.Data.push_back(0);
+		S.push_back(temp);
+		temp.Data.clear();
+		double y2, GSmin, GSmax;
+		double alpha1, alpha2;
+		for (;;) {
+			Output->Text += "j = " + j + System::Environment::NewLine;
+			if (j != 1) {
+				S[0].Data[1] = S[1].Data[1];
+			}
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X1 = [ " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			GSmax = (yMax - this->X.Data[1]) / S[0].Data[1];
+			GSmin = (yMin - this->X.Data[1]) / S[0].Data[1];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			alpha1 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[0]);
+			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
+			y2 = this->X.Data[1] + alpha1 * S[0].Data[1];
+			y2 = compare(yMax, yMin, y2);
+			this->X.Data[1] = y2;
+			Output->Text += "X2 = [ " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			++i;
+			S[1].Data[1] = alpha1 * S[0].Data[1];
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X2 = [ " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			GSmax = (yMax - this->X.Data[1]) / S[1].Data[1];
+			GSmin = (yMin - this->X.Data[1]) / S[1].Data[1];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			alpha2 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[1]);
+			Output->Text += "alpha = " + alpha2 + System::Environment::NewLine;
+			y2 = this->X.Data[1] + alpha2 * S[1].Data[1];
+			y2 = compare(yMax, yMin, y2);
+			Output->Text += "S2 = [ " + S[1].Data[1] + " ]" + System::Environment::NewLine;
+			Output->Text += "X3 = [ " + y2 + " ]" + System::Environment::NewLine;
+			if (abs(y2 - this->X.Data[1]) <= threshold) {
+				break;
+			}
+			this->X.Data[1] = y2;
+			i = 1;
+			++j;
+		}
+		Output->Text += "X = [ " + y2 + " ]" + System::Environment::NewLine;
+		Output->Text += "min = " + f(0, y2) + System::Environment::NewLine;
+	}
+	else if (dim == 3) {
+		// initial x , y
+		this->X.Data.push_back(x);
+		this->X.Data.push_back(y);
+		// initial
+		Vector temp;
+		// S1
+		temp.Data.push_back(1);
+		temp.Data.push_back(0);
+		S.push_back(temp);
+		temp.Data.clear();
+		// S2
+		temp.Data.push_back(0);
+		temp.Data.push_back(1);
+		S.push_back(temp);
+		temp.Data.clear();
+		// S3
+		temp.Data.push_back(0);
+		temp.Data.push_back(0);
+		S.push_back(temp);
+		temp.Data.clear();
+		double x2, y2;
+		double GSmin, GSmax;
+		double alpha1, alpha2, alpha3;
+		std::vector<double> GSsort;
+		for (;;) {
+			Output->Text += "j = " + j + System::Environment::NewLine;
+			if (j != 1) {
+				S[0].Data[0] = S[1].Data[0];
+				S[1].Data[0] = S[2].Data[0];
+				S[0].Data[1] = S[1].Data[1];
+				S[1].Data[1] = S[2].Data[1];
+			}
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X1 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			double max, min;
+			GSsort.push_back((xMax - this->X.Data[0]) / S[0].Data[0]);
+			GSsort.push_back((xMin - this->X.Data[0]) / S[0].Data[0]);
+			GSsort.push_back((yMax - this->X.Data[1]) / S[0].Data[1]);
+			GSsort.push_back((yMin - this->X.Data[1]) / S[0].Data[1]);
+			GSsort = sorting(GSsort);
+			GSmax = GSsort[2];
+			GSmin = GSsort[1];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			GSsort.clear();
+			alpha1 = goldenSectionSearch(GSmin, (GSmin + GSmax) / 2, GSmax, S[0]);
+			x2 = this->X.Data[0] + alpha1 * S[0].Data[0];
+			y2 = this->X.Data[1] + alpha1 * S[0].Data[1];
+			x2 = compare(xMax, xMin, x2);
+			y2 = compare(yMax, yMin, y2);
+			this->X.Data[0] = x2;
+			this->X.Data[1] = y2;
+			Output->Text += "X2 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			++i;
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "X2 = [ " + this->X.Data[0] + " , " + this->X.Data[0] + " ]" + System::Environment::NewLine;
+			GSsort.push_back((xMax - this->X.Data[0]) / S[1].Data[0]);
+			GSsort.push_back((xMin - this->X.Data[0]) / S[1].Data[0]);
+			GSsort.push_back((yMax - this->X.Data[1]) / S[1].Data[1]);
+			GSsort.push_back((yMin - this->X.Data[1]) / S[1].Data[1]);
+			GSsort = sorting(GSsort);
+			GSmax = GSsort[2];
+			GSmin = GSsort[1];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			GSsort.clear();
+			alpha2 = goldenSectionSearch(GSmin, (GSmin + GSmax) / 2, GSmax, S[1]);
+			x2 = this->X.Data[0] + alpha2 * S[1].Data[0];
+			y2 = this->X.Data[1] + alpha2 * S[1].Data[1];
+			x2 = compare(xMax, xMin, x2);
+			y2 = compare(yMax, yMin, y2);
+			this->X.Data[0] = x2;
+			this->X.Data[1] = y2;
+			Output->Text += "X3 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
+			S[2].Data[0] = alpha1 * S[0].Data[0] + alpha2 * S[1].Data[0];
+			S[2].Data[1] = alpha1 * S[0].Data[1] + alpha2 * S[1].Data[1];
+			GSsort.push_back((xMax - this->X.Data[0]) / S[2].Data[0]);
+			GSsort.push_back((xMin - this->X.Data[0]) / S[2].Data[0]);
+			GSsort.push_back((yMax - this->X.Data[1]) / S[2].Data[1]);
+			GSsort.push_back((yMin - this->X.Data[1]) / S[2].Data[1]);
+			GSsort = sorting(GSsort);
+			GSmax = GSsort[2];
+			GSmin = GSsort[1];
+			if (GSmax < GSmin) {
+				double temp = GSmax;
+				GSmax = GSmin;
+				GSmin = temp;
+			}
+			GSsort.clear();
+			alpha3 = goldenSectionSearch(GSmin, (GSmin + GSmax) / 2, GSmax, S[2]);
+			Output->Text += "alpha = " + alpha3 + System::Environment::NewLine;
+			x2 = this->X.Data[0] + alpha3 * S[2].Data[0];
+			y2 = this->X.Data[1] + alpha3 * S[2].Data[1];
+			x2 = compare(xMax, xMin, x2);
+			y2 = compare(yMax, yMin, y2);
+			Output->Text += "S3 = [ " + S[2].Data[0] + " , " + S[2].Data[1] + " ]" + System::Environment::NewLine;
+			Output->Text += "X4 = [ " + x2 + " , " + y2 + " ]" + System::Environment::NewLine;
+			if (abs(x2 - this->X.Data[0]) <= threshold && abs(y2 - this->X.Data[1]) <= threshold) {
+				break;
+			}
+			this->X.Data[0] = x2;
+			this->X.Data[1] = y2;
+			i = 1;
+			++j;
+		}
+		Output->Text += "X = [ " + x2 + " , " + y2 + " ]" + System::Environment::NewLine;
+		Output->Text += "min = " + f(x2, y2) + System::Environment::NewLine;
+	}
 }
 
 void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^ Output)
