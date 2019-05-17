@@ -154,7 +154,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, Vector S) {
 	else {
 		x = b - resphi * (b - a);
 	}
-	if (abs(c - a) < tau * (abs(b) + abs(x))) {
+	if (abs(c - a) <= tau * (abs(b) + abs(x))) {
 		return (c + a) / 2;
 	}
 	double fx, fb;
@@ -408,6 +408,7 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
 			x2 = this->X.Data[0] + alpha1 * S[0].Data[0];
 			x2 = compare(xMax, xMin, x2);
+			if (abs(x2 - this->X.Data[0]) < threshold) break;
 			this->X.Data[0] = x2;
 			Output->Text += "X2 = [ " + this->X.Data[0] + " ]" + System::Environment::NewLine;
 			++i;
@@ -469,6 +470,9 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
 			y2 = this->X.Data[1] + alpha1 * S[0].Data[1];
 			y2 = compare(yMax, yMin, y2);
+			if (abs(y2 - this->X.Data[1]) <= threshold) {
+				break;
+			}
 			this->X.Data[1] = y2;
 			Output->Text += "X2 = [ " + this->X.Data[1] + " ]" + System::Environment::NewLine;
 			++i;
@@ -522,6 +526,7 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 		double x2, y2;
 		double GSmin, GSmax;
 		double alpha1, alpha2, alpha3;
+		int sinorbo = 0;
 		std::vector<double> GSsort;
 		for (;;) {
 			Output->Text += "j = " + j + System::Environment::NewLine;
@@ -534,13 +539,26 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			Output->Text += "i = " + i + System::Environment::NewLine;
 			Output->Text += "X1 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
 			double max, min;
-			GSsort.push_back((xMax - this->X.Data[0]) / S[0].Data[0]);
-			GSsort.push_back((xMin - this->X.Data[0]) / S[0].Data[0]);
-			GSsort.push_back((yMax - this->X.Data[1]) / S[0].Data[1]);
-			GSsort.push_back((yMin - this->X.Data[1]) / S[0].Data[1]);
+			if (S[0].Data[0] != 0) {
+				GSsort.push_back((xMax - this->X.Data[0]) / S[0].Data[0]);
+				GSsort.push_back((xMin - this->X.Data[0]) / S[0].Data[0]);
+				sinorbo++;
+			}
+			if (S[0].Data[1] != 0) {
+				GSsort.push_back((yMax - this->X.Data[1]) / S[0].Data[1]);
+				GSsort.push_back((yMin - this->X.Data[1]) / S[0].Data[1]);
+				sinorbo++;
+			}
 			GSsort = sorting(GSsort);
-			GSmax = GSsort[2];
-			GSmin = GSsort[1];
+			if (sinorbo == 2) {
+				GSmax = GSsort[2];
+				GSmin = GSsort[1];
+			}
+			else {
+				GSmax = GSsort[1];
+				GSmin = GSsort[0];
+			}
+			sinorbo = 0;
 			if (GSmax < GSmin) {
 				double temp = GSmax;
 				GSmax = GSmin;
@@ -552,19 +570,35 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			y2 = this->X.Data[1] + alpha1 * S[0].Data[1];
 			x2 = compare(xMax, xMin, x2);
 			y2 = compare(yMax, yMin, y2);
+			if (abs(f(x2, y2) - f(this->X.Data[0], this->X.Data[1])) <= threshold && abs(sqrt(pow((x2 - this->X.Data[0]), 2) + pow((y2 - this->X.Data[1]), 2))) <= threshold) {
+				break;
+			}
 			this->X.Data[0] = x2;
 			this->X.Data[1] = y2;
 			Output->Text += "X2 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
 			++i;
 			Output->Text += "i = " + i + System::Environment::NewLine;
 			Output->Text += "X2 = [ " + this->X.Data[0] + " , " + this->X.Data[0] + " ]" + System::Environment::NewLine;
-			GSsort.push_back((xMax - this->X.Data[0]) / S[1].Data[0]);
-			GSsort.push_back((xMin - this->X.Data[0]) / S[1].Data[0]);
-			GSsort.push_back((yMax - this->X.Data[1]) / S[1].Data[1]);
-			GSsort.push_back((yMin - this->X.Data[1]) / S[1].Data[1]);
+			if (S[1].Data[0] != 0) {
+				GSsort.push_back((xMax - this->X.Data[0]) / S[1].Data[0]);
+				GSsort.push_back((xMin - this->X.Data[0]) / S[1].Data[0]);
+				sinorbo++;
+			}
+			if (S[1].Data[1] != 0) {
+				GSsort.push_back((yMax - this->X.Data[1]) / S[1].Data[1]);
+				GSsort.push_back((yMin - this->X.Data[1]) / S[1].Data[1]);
+				sinorbo++;
+			}
 			GSsort = sorting(GSsort);
-			GSmax = GSsort[2];
-			GSmin = GSsort[1];
+			if (sinorbo == 2) {
+				GSmax = GSsort[2];
+				GSmin = GSsort[1];
+			}
+			else {
+				GSmax = GSsort[1];
+				GSmin = GSsort[0];
+			}
+			sinorbo = 0;
 			if (GSmax < GSmin) {
 				double temp = GSmax;
 				GSmax = GSmin;
@@ -576,6 +610,9 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			y2 = this->X.Data[1] + alpha2 * S[1].Data[1];
 			x2 = compare(xMax, xMin, x2);
 			y2 = compare(yMax, yMin, y2);
+			if (abs(f(x2, y2) - f(this->X.Data[0], this->X.Data[1])) <= threshold && abs(sqrt(pow((x2 - this->X.Data[0]), 2) + pow((y2 - this->X.Data[1]), 2))) <= threshold) {
+				break;
+			}
 			this->X.Data[0] = x2;
 			this->X.Data[1] = y2;
 			Output->Text += "X3 = [ " + this->X.Data[0] + " , " + this->X.Data[1] + " ]" + System::Environment::NewLine;
@@ -602,7 +639,8 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 			y2 = compare(yMax, yMin, y2);
 			Output->Text += "S3 = [ " + S[2].Data[0] + " , " + S[2].Data[1] + " ]" + System::Environment::NewLine;
 			Output->Text += "X4 = [ " + x2 + " , " + y2 + " ]" + System::Environment::NewLine;
-			if (abs(x2 - this->X.Data[0]) <= threshold && abs(y2 - this->X.Data[1]) <= threshold) {
+			std::cout << f(x2, y2) << std::endl;
+			if (abs(f(x2, y2) - f(this->X.Data[0], this->X.Data[1])) <= threshold && abs(sqrt(pow((x2 - this->X.Data[0]), 2) + pow((y2 - this->X.Data[1]), 2))) <= threshold) {
 				break;
 			}
 			this->X.Data[0] = x2;
