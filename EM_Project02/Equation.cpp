@@ -769,7 +769,7 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 		// Step
 		Matrix H = Hessian(now_x);	// Hessian
 		Matrix InvH = Inverse(H);	// Inverse Hessian
-		Matrix S = G * InvH;
+		Matrix S = G * Transpose(InvH);
 		step = S.Data[0];
 
 		now_x = pre_x - step;
@@ -840,32 +840,22 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 
 	int k = 0;
 	while (Max_iter-- > 0) {
-
+		pre_x = now_x;
 		Matrix G = Gradient(pre_x);
 		Vector gradient = G.Data[0];	// Matrix to Vector
-
-		// Not A Number Happened
-		while (isnan(gradient.Data[0])) {
-			step = 0.9 * step;
-			now_x = pre_x + step;
-
-			G = Gradient(now_x);
-			gradient = G.Data[0];
-			gradient = -1 * gradient;
-		}
 
 		// stop criteria
 		if (Norm(gradient) == 0) {
 			break;
 		}
-		Matrix D = gradient * Fake_InvH;
+		Matrix D = G * Transpose(Fake_InvH);
 		D = -1 * D;
 
 		// Compute Afa Step (skip)
-		Matrix Afa = -1 * gradient * D * Inverse(D * Fake_InvH * Transpose(D));
+		Matrix Afa = -1 * G * Transpose(D) * Inverse(D * Hessian(now_x) * Transpose(D));
 		step = Afa.Data[0] * D.Data[0];
 
-		pre_x = now_x;
+		//pre_x = now_x;
 		now_x = pre_x + step;
 
 		// Compute Fake Inverse Hessian
@@ -883,7 +873,7 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 		Matrix Yk = now_G - G;
 		Fake_InvH = Fake_InvH + Transpose(Step) * Step * Inverse(Step * Transpose(Yk)) - Fake_InvH * Transpose(Yk) * Yk * Transpose(Fake_InvH) * Inverse(Yk * Fake_InvH * Transpose(Yk));
 		
-		// Stopping Criteria
+		//Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
 			break;
 		}
