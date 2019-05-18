@@ -832,17 +832,19 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 	else if (dim == 1) {
 		X.initial(x);
 	}
+
 	Vector pre_x = X, now_x = X;
+	Matrix Fake_InvH;	// Fake Inverse Hessian
+	Fake_InvH.identity(X);	// Initial Identity Matrix
 	Vector step;
 
 	int k = 0;
 	while (Max_iter-- > 0) {
 
-		// Gradient
-		Matrix G = Gradient(now_x);
+		Matrix G = Gradient(pre_x);
 		Vector gradient = G.Data[0];	// Matrix to Vector
 
-										// Not A Number Happened
+		// Not A Number Happened
 		while (isnan(gradient.Data[0])) {
 			step = 0.9 * step;
 			now_x = pre_x + step;
@@ -851,50 +853,61 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 			gradient = G.Data[0];
 			gradient = -1 * gradient;
 		}
+
+		// stop criteria
+		if (Norm(gradient) == 0) {
+			break;
+		}
+		Matrix D = gradient * Fake_InvH;
+		D = -1 * D;
+
+		// Compute Afa Step (skip)
+		Matrix Afa = -1 * gradient * D * Inverse(D * Fake_InvH * Transpose(D));
+		step = Afa.Data[0] * D.Data[0];
+
 		pre_x = now_x;
+		now_x = pre_x + step;
 
-		// Step
-		Matrix H = Hessian(now_x);	// Hessian
-		Matrix InvH = Inverse(H);	// Inverse Hessian
-		Matrix S = G * InvH;
-		step = S.Data[0];
+		// Compute Fake Inverse Hessian
+		Matrix Step(step);
+		Matrix now_G = Gradient(now_x);
 
-		now_x = pre_x - step;
+		// Not A Number
+		while (isnan(now_G.Data[0].Data[0])) {
+			step = 0.9 * step;
+			now_x = pre_x + step;
 
+			now_G = Gradient(now_x);
+		}
+
+		Matrix Yk = now_G - G;
+		Fake_InvH = Fake_InvH + Transpose(Step) * Step * Inverse(Step * Transpose(Yk)) - Fake_InvH * Transpose(Yk) * Yk * Transpose(Fake_InvH) * Inverse(Yk * Fake_InvH * Transpose(Yk));
+		
 		// Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
 			break;
 		}
-
 		k++;
 
 
 		/* Form print*/
 		// i
 		Output->Text += "i = " + k.ToString() + System::Environment::NewLine;
-		// hessian
-		Output->Text += "Hessian =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
-		for (int i = 0; i < H.getRow(); i++) {
-			for (int j = 0; j < H.getCol(); j++) {
-				Output->Text += H.Data[i].Data[j].ToString() + ", ";
-			}
-			Output->Text += System::Environment::NewLine;
-		}
-		Output->Text += "]" + System::Environment::NewLine;
-		// hessian inverse
-		Output->Text += "Hessian Inverse =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
-		for (int i = 0; i < InvH.getRow(); i++) {
-			for (int j = 0; j < InvH.getCol(); j++) {
-				Output->Text += InvH.Data[i].Data[j].ToString() + ", ";
-			}
-			Output->Text += System::Environment::NewLine;
-		}
-		Output->Text += "]" + System::Environment::NewLine;
 		// x
 		Output->Text += "X =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
 		for (int i = 0; i < now_x.getDim(); i++)
 			Output->Text += now_x.Data[i].ToString() + System::Environment::NewLine;
 		Output->Text += " ]" + System::Environment::NewLine + System::Environment::NewLine;
+		// hessian
+		Output->Text += "Hessian =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		for (int i = 0; i < Fake_InvH.getRow(); i++) {
+			for (int j = 0; j < Fake_InvH.getCol(); j++) {
+				Output->Text += Fake_InvH.Data[i].Data[j].ToString() + ", ";
+			}
+			Output->Text += System::Environment::NewLine;
+		}
+		Output->Text += "]" + System::Environment::NewLine;
+		
 	}
 
 	Output->Text += "[";
@@ -903,8 +916,5 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 	}
 	Output->Text += "]" + System::Environment::NewLine;
 	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
-
-
-
 }
 

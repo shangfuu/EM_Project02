@@ -13,6 +13,8 @@ class Matrix
 public:
 	Matrix();
 	Matrix(std::vector<Vector>);
+	Matrix(const Vector&);
+	void identity(const Vector&);
 
 	std::vector<Vector> Data;	// Row Vector
 
@@ -28,6 +30,7 @@ public:
 	friend Matrix operator+(const Matrix&, const Matrix&);
 	friend Matrix operator-(const Matrix&, const Matrix&);
 	friend Matrix operator*(const Matrix&, const Matrix&);	// Matrix Multiplication
+	friend Matrix operator*(const double&, const Matrix&);	// scalar
 
 	/* Method */
 	int Rank() const;		// nonZero rows
