@@ -820,7 +820,7 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 
 void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
 {
-	double Precision = 0.001;
+	double Precision = 0.0001;
 	int Max_iter = 500;
 
 	if (dim == 3) {
@@ -871,7 +871,15 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 		}
 
 		Matrix Yk = now_G - G;
-		Fake_InvH = Fake_InvH + Transpose(Step) * Step * Inverse(Step * Transpose(Yk)) - Fake_InvH * Transpose(Yk) * Yk * Transpose(Fake_InvH) * Inverse(Yk * Fake_InvH * Transpose(Yk));
+		Matrix M1 = Transpose(Step) * Step;
+		double d1 = 1 / (Step * Transpose(Yk)).Data[0].Data[0];
+
+		Matrix M21 = Fake_InvH * Transpose(Yk);
+		Matrix M22 = Transpose(Fake_InvH * Transpose(Yk));
+		Matrix M2 = M21 * M22;
+		double d2 = 1 / (Yk * Fake_InvH * Transpose(Yk)).Data[0].Data[0];
+
+		Fake_InvH = Fake_InvH + d1 * M1 - d2 * M2;
 		
 		//Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
@@ -897,9 +905,7 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 			Output->Text += System::Environment::NewLine;
 		}
 		Output->Text += "]" + System::Environment::NewLine;
-		
 	}
-
 	Output->Text += "[";
 	for (int i = 0; i < pre_x.getDim(); i++) {
 		Output->Text += pre_x.Data[i].ToString() + " , ";
