@@ -405,8 +405,8 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 				GSmin = temp;
 			}
 			alpha1 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[0]);
-			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
 			x2 = this->X.Data[0] + alpha1 * S[0].Data[0];
+			Output->Text += "alpha = " + alpha1 + System::Environment::NewLine;
 			x2 = compare(xMax, xMin, x2);
 			if (abs(x2 - this->X.Data[0]) < threshold) break;
 			this->X.Data[0] = x2;
@@ -423,8 +423,8 @@ void Equation::Powell(double x, double y, double xMin, double xMax, double yMin,
 				GSmin = temp;
 			}
 			alpha2 = goldenSectionSearch(GSmin, (GSmax + GSmin) / 2, GSmax, S[1]);
-			Output->Text += "alpha = " + alpha2 + System::Environment::NewLine;
 			x2 = this->X.Data[0] + alpha2 * S[1].Data[0];
+			Output->Text += "alpha = " + alpha2 + System::Environment::NewLine;
 			x2 = compare(xMax, xMin, x2);
 			Output->Text += "S2 = [ " + S[1].Data[0] + " ]" + System::Environment::NewLine;
 			Output->Text += "X3 = [ " + x2 + " ]" + System::Environment::NewLine;
@@ -790,6 +790,13 @@ void Equation::Conjugate(double x, double y, double xMin, double xMax, double yM
 			preG = gradient;
 			G = Gradient(X);
 			gradient = G.Data[0];
+			while (isnan(gradient.Data[0])) {
+				alpha *= 0.9;
+				X.Data[0] += alpha * si.Data[0];
+				X.Data[1] += alpha * si.Data[1];
+				G = Gradient(X);
+				gradient = G.Data[0];
+			}
 			H = Hessian(X);
 			beta = (pow(gradient.Data[0], 2) + pow(gradient.Data[1], 2)) / (pow(preG.Data[0], 2) + pow(preG.Data[1], 2));
 			si.Data[0] = -gradient.Data[0] + beta * si.Data[0];
@@ -840,11 +847,21 @@ void Equation::Conjugate(double x, double y, double xMin, double xMax, double yM
 			if (dim == 2) {
 				X.Data[0] = compare(yMax, yMin, X.Data[0]);
 				gradient = dY(0, X.Data[0]);
+				while (isnan(gradient)) {
+					alpha *= 0.9;
+					X.Data[0] += alpha;
+					gradient = dY(0, X.Data[0]);
+				}
 				d = (dY(0, X.Data[0] + threshold) - dY(0, X.Data[0] - threshold)) / (2 * threshold);
 			}
 			else if (dim == 1) {
 				X.Data[0] = compare(xMax, xMin, X.Data[0]);
 				gradient = dX(X.Data[0], 0);
+				while (isnan(gradient)) {
+					alpha *= 0.9;
+					X.Data[0] += alpha;
+					gradient = dX(X.Data[0], 0);
+				}
 				d = (dX(X.Data[0] + threshold, 0) - dX(X.Data[0] - threshold, 0)) / (2 * threshold);
 			}
 			beta = pow(gradient, 2) / pow(preG, 2);
