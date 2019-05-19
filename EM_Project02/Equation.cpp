@@ -870,7 +870,7 @@ void Equation::Conjugate(double x, double y, double xMin, double xMax, double yM
 		else if (dim == 1) {
 			Output->Text += "min = " + f(X.Data[0], 0) + System::Environment::NewLine;
 		}
-	}s
+	}
 }
 
 void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
