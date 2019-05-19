@@ -694,13 +694,8 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 
 		// Not A Number Happened
 		while (isnan(gradient.Data[0])) {
-			std::cout << " Test ----------------------" << std::endl;
-			std::cout << "G = " << gradient.Data[0] << std::endl;
-			std::cout << "step = " << step.Data[0] << std::endl;
 			step = 0.9 * step;
-			std::cout << "step = " << step.Data[0] << std::endl;
 			now_x = pre_x + step;
-			std::cout << "x = " << now_x.Data[0] << std::endl;
 
 			G = Gradient(now_x);
 			gradient = G.Data[0];
@@ -748,19 +743,7 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 		for (int i = 0; i < now_x.getDim(); i++)
 			Output->Text += now_x.Data[i].ToString() + System::Environment::NewLine;
 		Output->Text += " ]" + System::Environment::NewLine + System::Environment::NewLine;
-
-		/* std print */
-		std::cout << k << std::endl;
-		for (int i = 0; i < gradient.getDim(); i++) {
-			std::cout << "h = " << gradient.Data[i] << std::endl;
-		}
-		std::cout << "Lambda = " << lambda.Data[0] << std::endl;
-		for (int i = 0; i < now_x.getDim(); i++) {
-			std::cout << "X = " << now_x.Data[i] << std::endl;
-		}
 	}
-
-
 	Output->Text += "[";
 	for (int i = 0; i < pre_x.getDim(); i++) {
 		Output->Text += pre_x.Data[i].ToString() + " , ";

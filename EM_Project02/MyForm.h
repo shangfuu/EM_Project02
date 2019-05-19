@@ -656,23 +656,23 @@ namespace Optimization {
 				}
 				else {
 					if (Method == 0) {
-						Output->Text += "Powell¡¦s Method" + Environment::NewLine;
+						Output->Text += "-----  Powell¡¦s Method  -----" + Environment::NewLine;
 						f.Powell(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 					else if (Method == 1) {
-						Output->Text += "Newton Method" + Environment::NewLine;
+						Output->Text += "-----  Newton Method  -----" + Environment::NewLine;
 						f.Newton(x, y, Output);
 					}
 					else if (Method == 2) {
-						Output->Text += "Steep Method" + Environment::NewLine;
+						Output->Text += "-----  Steep Method  -----" + Environment::NewLine;
 						f.Steepest_Descent(x, y, xMin, xMax, yMin, yMax, Output);	// Example call;
 					}
 					else if (Method == 3) {
-						Output->Text += "Quasi Method" + Environment::NewLine;
+						Output->Text += "-----  Quasi Method  -----" + Environment::NewLine;
 						f.Quasi_Newton(x, y, Output);
 					}
 					else {
-						Output->Text += "Conjugate Method" + Environment::NewLine;
+						Output->Text += "-----  Conjugate Method  -----" + Environment::NewLine;
 					}
 				}
 			}
