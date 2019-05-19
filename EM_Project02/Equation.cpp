@@ -746,24 +746,12 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 		X.initial(x);
 	}
 	Vector pre_x = X, now_x = X;
+	Matrix G = Gradient(pre_x); // Gradient
 	Vector step;
 
 	int k = 0;
 	while (Max_iter-- > 0) {
 
-		// Gradient
-		Matrix G = Gradient(now_x);
-		Vector gradient = G.Data[0];	// Matrix to Vector
-
-		// Not A Number Happened
-		while (isnan(gradient.Data[0])) {
-			step = 0.9 * step;
-			now_x = pre_x + step;
-
-			G = Gradient(now_x);
-			gradient = G.Data[0];
-			gradient = -1 * gradient;
-		}
 		pre_x = now_x;
 
 		// Step
@@ -773,6 +761,16 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 		step = S.Data[0];
 
 		now_x = pre_x - step;
+
+		G = Gradient(now_x);
+		// Not A Number Happened
+		while (isnan(G.Data[0].Data[0])) {
+			step = 0.9 * step;
+			now_x = pre_x - step;
+
+			G = Gradient(now_x);
+		}
+
 
 		// Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
