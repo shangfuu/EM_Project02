@@ -673,6 +673,7 @@ namespace Optimization {
 					}
 					else {
 						Output->Text += "-----  Conjugate Method  -----" + Environment::NewLine;
+						f.Conjugate(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 				}
 			}

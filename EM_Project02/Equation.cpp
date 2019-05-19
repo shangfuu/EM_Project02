@@ -752,6 +752,127 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
 }
 
+void Equation::Conjugate(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox ^ Output)
+{
+	if (dim == 3) {
+		X.initial(x, y);
+	}
+	else if (dim == 2) {
+		X.initial(y);
+	}
+	else if (dim == 1) {
+		X.initial(x);
+	}
+	int i = 0;
+	if (dim == 3) {
+		double alpha, beta;
+		Matrix G = Gradient(X);
+		Vector gradient = G.Data[0];
+		Matrix H = Hessian(X);
+		Vector si, Q;
+		si.Data.push_back(-gradient.Data[0]);
+		si.Data.push_back(-gradient.Data[1]);
+		Q.Data.push_back(si.Data[0] * H.Data[0].Data[0] + si.Data[1] * H.Data[0].Data[1]);
+		Q.Data.push_back(si.Data[0] * H.Data[1].Data[0] + si.Data[1] * H.Data[1].Data[1]);
+		alpha = -(gradient.Data[0] * si.Data[0] + gradient.Data[1] * si.Data[1]) / (Q.Data[0] * si.Data[0] + Q.Data[1] * si.Data[1]);
+		X.Data[0] += alpha * si.Data[0];
+		X.Data[1] += alpha * si.Data[1];
+		Output->Text += "i = " + i + System::Environment::NewLine;
+		Output->Text += "Si = [ " + gradient.Data[0] + " , " + gradient.Data[1] + " ]" + System::Environment::NewLine;
+		Output->Text += "alpha = " + alpha + System::Environment::NewLine;
+		Output->Text += "Xi = [" + X.Data[0] + " , " + X.Data[1] + " ]" + System::Environment::NewLine;
+		Vector preG;
+		while (i <= 100)
+		{
+			X.Data[0] = compare(xMax, xMin, X.Data[0]);
+			X.Data[1] = compare(yMax, yMin, X.Data[1]);
+			++i;
+			preG = gradient;
+			G = Gradient(X);
+			gradient = G.Data[0];
+			H = Hessian(X);
+			beta = (pow(gradient.Data[0], 2) + pow(gradient.Data[1], 2)) / (pow(preG.Data[0], 2) + pow(preG.Data[1], 2));
+			si.Data[0] = -gradient.Data[0] + beta * si.Data[0];
+			si.Data[1] = -gradient.Data[1] + beta * si.Data[1];
+			Q.Data[0] = si.Data[0] * H.Data[0].Data[0] + si.Data[1] * H.Data[0].Data[1];
+			Q.Data[1] = si.Data[0] * H.Data[1].Data[0] + si.Data[1] * H.Data[1].Data[1];
+			alpha = -(gradient.Data[0] * si.Data[0] + gradient.Data[1] * si.Data[1]) / (Q.Data[0] * si.Data[0] + Q.Data[1] * si.Data[1]);
+			if (X.Data[0] + alpha * si.Data[0] < 0 || X.Data[1] + alpha * si.Data[1] < 0) {
+				alpha *= 0.9;
+			}
+			X.Data[0] += alpha * si.Data[0];
+			X.Data[1] += alpha * si.Data[1];
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "beta = " + beta + System::Environment::NewLine;
+			Output->Text += "Si = [ " + gradient.Data[0] + " , " + gradient.Data[1] + " ]" + System::Environment::NewLine;
+			Output->Text += "alpha = " + alpha + System::Environment::NewLine;
+			Output->Text += "Xi = [" + X.Data[0] + " , " + X.Data[1] + " ]" + System::Environment::NewLine;
+			if (abs(gradient.Data[0]) < threshold&&abs(gradient.Data[1]) < threshold) {
+				break;
+			}
+		}
+		Output->Text += "X = [" + X.Data[0] + " , " + X.Data[1] + " ]" + System::Environment::NewLine;
+		Output->Text += "min = " + f(X) + System::Environment::NewLine;
+	}
+	else {
+		double alpha, beta;
+		double gradient, d;
+		if (dim == 2) {
+			gradient = dY(0, X.Data[0]);
+			d = (dY(0, X.Data[0] + threshold) - dY(0, X.Data[0] - threshold)) / (2 * threshold);
+		}
+		else if (dim == 1) {
+			gradient = dX(X.Data[0], 0);
+			d = (dX(X.Data[0] + threshold, 0) - dX(X.Data[0] - threshold, 0)) / (2 * threshold);
+		}
+		double si = -gradient;
+		alpha = -(gradient*si) / ((pow(si, 2)*d));
+		X.Data[0] += alpha * si;
+		Output->Text += "i = " + i + System::Environment::NewLine;
+		Output->Text += "Si = [ " + gradient + " ]" + System::Environment::NewLine;
+		Output->Text += "alpha = " + alpha + System::Environment::NewLine;
+		Output->Text += "Xi = [" + X.Data[0] + " ]" + System::Environment::NewLine;
+		double preG;
+		while (i <= 100)
+		{
+			++i;
+			preG = gradient;
+			if (dim == 2) {
+				X.Data[0] = compare(yMax, yMin, X.Data[0]);
+				gradient = dY(0, X.Data[0]);
+				d = (dY(0, X.Data[0] + threshold) - dY(0, X.Data[0] - threshold)) / (2 * threshold);
+			}
+			else if (dim == 1) {
+				X.Data[0] = compare(xMax, xMin, X.Data[0]);
+				gradient = dX(X.Data[0], 0);
+				d = (dX(X.Data[0] + threshold, 0) - dX(X.Data[0] - threshold, 0)) / (2 * threshold);
+			}
+			beta = pow(gradient, 2) / pow(preG, 2);
+			si = -gradient + beta * si;
+			alpha = -(gradient*si) / ((pow(si, 2)*d));
+			if (X.Data[0] + alpha * si < 0) {
+				alpha *= 0.9;
+			}
+			X.Data[0] += alpha * si;
+			Output->Text += "i = " + i + System::Environment::NewLine;
+			Output->Text += "beta = " + beta + System::Environment::NewLine;
+			Output->Text += "Si = [ " + gradient + " ]" + System::Environment::NewLine;
+			Output->Text += "alpha = " + alpha + System::Environment::NewLine;
+			Output->Text += "Xi = [" + X.Data[0] + " ]" + System::Environment::NewLine;
+			if (abs(gradient) < threshold) {
+				break;
+			}
+		}
+		Output->Text += "X = [" + X.Data[0] + " ]" + System::Environment::NewLine;
+		if (dim == 2) {
+			Output->Text += "min = " + f(0, X.Data[0]) + System::Environment::NewLine;
+		}
+		else if (dim == 1) {
+			Output->Text += "min = " + f(X.Data[0], 0) + System::Environment::NewLine;
+		}
+	}s
+}
+
 void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
 {
 	double Precision = 0.001;
