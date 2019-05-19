@@ -9,6 +9,24 @@ Matrix::Matrix(std::vector<Vector>matrix)
 	this->Data = matrix;
 }
 
+Matrix::Matrix(const Vector &v)
+{
+	this->Data.push_back(v);
+}
+
+void Matrix::identity(const Vector &v)
+{
+	if (v.getDim() == 2) {
+		Vector row1(1, 0), row2(0, 1);
+		Data.push_back(row1);
+		Data.push_back(row2);
+	}
+	else if (v.getDim() == 1) {
+		Vector tmp(1);
+		Data.push_back(tmp);
+	}
+}
+
 Matrix operator+(const Matrix& m1, const Matrix& m2)
 {
 	Matrix mat;
@@ -30,13 +48,43 @@ Matrix operator-(const Matrix & m1, const Matrix & m2)
 Matrix operator*(const Matrix & m1, const Matrix & m2)
 {
 	Matrix mat;
-	mat.Data.resize(m1.getRow());
-	for (int i = 0; i < m1.getRow(); i++) {
-		mat.Data[i].Data.resize(m2.getCol());
-		for (int j = 0; j < m2.getCol(); j++) {
-			for (int k = 0; k < m1.getCol(); k++) {
-				mat.Data[i].Data[j] += m1.Data[i].Data[k] * m2.Data[k].Data[j];
+	if (m1.getCol() == 1 && m1.getRow() == 1) {
+		mat = m2;
+		for (int i = 0; i < mat.Data.size(); i++) {
+			for (int j = 0; j < mat.Data[i].Data.size(); j++) {
+				mat.Data[i] = Scalar(mat.Data[i], m1.Data[0]);
 			}
+		}
+	}
+	else if (m2.getCol() == 1 && m2.getRow() == 1) {
+		mat = m1;
+		for (int i = 0; i < mat.Data.size(); i++) {
+			for (int j = 0; j < mat.Data[i].Data.size(); j++) {
+				mat.Data[i] = Scalar(mat.Data[i], m1.Data[0]);
+			}
+		}
+	}
+	else {
+		mat.Data.resize(m1.getRow());
+		for (int i = 0; i < m1.getRow(); i++) {
+			mat.Data[i].Data.resize(m2.getCol());
+			for (int j = 0; j < m2.getCol(); j++) {
+				for (int k = 0; k < m1.getCol(); k++) {
+					mat.Data[i].Data[j] += m1.Data[i].Data[k] * m2.Data[k].Data[j];
+				}
+			}
+		}
+	}
+
+	return mat;
+}
+
+Matrix operator*(const double & num, const Matrix & m)
+{
+	Matrix mat = m;
+	for (int i = 0; i < mat.getRow(); i++) {
+		for (int j = 0; j < mat.getCol(); j++) {
+			mat.Data[i].Data[j] = num * mat.Data[i].Data[j];
 		}
 	}
 	return mat;
