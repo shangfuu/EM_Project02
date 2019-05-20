@@ -754,6 +754,7 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 
 void Equation::Conjugate(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox ^ Output)
 {
+	// reference:	https://ch-hsieh.blogspot.com/2014/03/conjugate-direction-methods-2-conjugate.html
 	if (dim == 3) {
 		X.initial(x, y);
 	}
