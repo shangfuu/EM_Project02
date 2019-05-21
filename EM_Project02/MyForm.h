@@ -576,6 +576,8 @@ namespace Optimization {
 					IniY->Text = "";
 					MinX->Text = "";
 					MinY->Text = "";
+					MaxX->Text = "";
+					MaxY->Text = "";
 				}
 				else if (userCommand->Length == 1 && userCommand[0] == "/c") {
 					Input->Text = "";
@@ -583,6 +585,8 @@ namespace Optimization {
 					IniY->Text = "";
 					MinX->Text = "";
 					MinY->Text = "";
+					MaxX->Text = "";
+					MaxY->Text = "";
 					Output->Text = "";
 				}
 				else {
