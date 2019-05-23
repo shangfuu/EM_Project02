@@ -18,6 +18,8 @@ bool DataManager::LoadEquationData()
 	}
 	else
 	{
+		Equations.clear();
+		postfix_equations.clear();
 		//定義讀取檔案字串暫存變數
 		std::string tempString;
 		//執行讀檔迴圈，並在讀到檔案結尾時結束
@@ -30,7 +32,6 @@ bool DataManager::LoadEquationData()
 			//遞增EquationIndex，標記到當前讀取向量ID
 			EquationIndex++;
 			postfix_equations.push_back(postfix(tempString));
-			
 		}
 		return true;
 	}

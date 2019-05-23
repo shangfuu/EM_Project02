@@ -524,6 +524,7 @@ namespace Optimization {
 		if (dataManager->LoadEquationData())
 		{
 			loadFile = true;	//	judge at button click
+			EquBox->Text = "";
 			std::vector<std::string> equations = dataManager->GetEquations();
 			EquBox->Multiline = true;
 			for (unsigned int i = 0; i < equations.size(); i++)
