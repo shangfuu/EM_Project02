@@ -912,14 +912,24 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 	int k = 0;
 	while (Max_iter-- > 0) {
 
-		pre_x = now_x;
+		
 
 		// Step
 		Matrix H = Hessian(now_x);	// Hessian
 		Matrix InvH = Inverse(H);	// Inverse Hessian
 		Matrix S = G * Transpose(InvH);
+		// Not a Number
+		while (isnan(S.Data[0].Data[0]) || isnan(G.Data[0].Data[0])) {
+			step = step * 0.9;
+			now_x = pre_x - step;
+
+			H = Hessian(now_x);
+			InvH = Inverse(H);
+			S = Gradient(now_x) * Transpose(InvH);
+		}
 		step = S.Data[0];
 
+		pre_x = now_x;
 		now_x = pre_x - step;
 
 		G = Gradient(now_x);
@@ -1055,7 +1065,7 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 			Output->Text += now_x.Data[i].ToString() + System::Environment::NewLine;
 		Output->Text += " ]" + System::Environment::NewLine + System::Environment::NewLine;
 		// hessian
-		Output->Text += "Hessian =" + System::Environment::NewLine + "[" + System::Environment::NewLine;
+		Output->Text += "Hessian Inverse=" + System::Environment::NewLine + "[" + System::Environment::NewLine;
 		for (int i = 0; i < Fake_InvH.getRow(); i++) {
 			for (int j = 0; j < Fake_InvH.getCol(); j++) {
 				Output->Text += Fake_InvH.Data[i].Data[j].ToString() + ", ";
