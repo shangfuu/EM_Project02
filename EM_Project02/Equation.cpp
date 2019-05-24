@@ -154,7 +154,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, Vector S) {
 	else {
 		x = b - resphi * (b - a);
 	}
-	if (abs(c - a) <= tau * (abs(b) + abs(x))) {
+	if (abs(c - a) <= threshold * (abs(b) + abs(x))) {
 		return (c + a) / 2;
 	}
 	double fx, fb;
@@ -170,7 +170,7 @@ double Equation::goldenSectionSearch(double a, double b, double c, Vector S) {
 		fb = f(this->X.Data[0] + b * S.Data[0], this->X.Data[1] + b * S.Data[1]);
 		fx = f(this->X.Data[0] + x * S.Data[0], this->X.Data[1] + x * S.Data[1]);
 	}
-	if (fx < fb) {
+	if (fx < fb && !isnan(fx)) {
 		if (c - b > b - a) return goldenSectionSearch(b, x, c, S);
 		else return goldenSectionSearch(a, x, b, S);
 	}
