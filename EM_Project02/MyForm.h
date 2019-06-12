@@ -656,7 +656,7 @@ namespace Optimization {
 				if (xMin > xMax || yMin > yMax) {
 					Output->Text += "Min must Smaller than Max" + Environment::NewLine;
 				}
-				else if ((x < xMin || x > xMax || y < yMin || y > yMax) && Method != 1 && Method != 3) {
+				else if (x < xMin || x > xMax || y < yMin || y > yMax) {
 					Output->Text += "Foolish Interval and Initial" + Environment::NewLine;
 				}
 				else {
@@ -666,7 +666,7 @@ namespace Optimization {
 					}
 					else if (Method == 1) {
 						Output->Text += "-----  Newton Method  -----" + Environment::NewLine;
-						f.Newton(x, y, Output);
+						f.Newton(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 					else if (Method == 2) {
 						Output->Text += "-----  Steep Method  -----" + Environment::NewLine;
@@ -674,7 +674,7 @@ namespace Optimization {
 					}
 					else if (Method == 3) {
 						Output->Text += "-----  Quasi Method  -----" + Environment::NewLine;
-						f.Quasi_Newton(x, y, Output);
+						f.Quasi_Newton(x, y, xMin, xMax, yMin, yMax, Output);
 					}
 					else {
 						Output->Text += "-----  Conjugate Method  -----" + Environment::NewLine;

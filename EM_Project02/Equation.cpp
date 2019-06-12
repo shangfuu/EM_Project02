@@ -704,6 +704,11 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 		pre_x = now_x;
 
 		// step 2 : compute step-size lambda
+
+		/*Matrix L1 = G * Transpose(G);
+		Matrix H = Hessian(pre_x);
+		Matrix L2 = Inverse(G*H*Transpose(G));
+		Matrix LL = L1 * L2;*/
 		Matrix L = G * Transpose(G) * Inverse(G * Hessian(pre_x) * Transpose(G));
 
 		Vector lambda = L.Data[0];
@@ -891,20 +896,29 @@ void Equation::Conjugate(double x, double y, double xMin, double xMax, double yM
 	}
 }
 
-void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
+void Equation::Newton(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox ^Output)
 {
 	double Precision = 0.001;
 	int Max_iter = 500;
 
+	// Initial X Vector and Internal Vector
+	Vector Max_X, Min_X;
 	if (dim == 3) {
 		X.initial(x, y);
+		Max_X.initial(xMax, yMax);
+		Min_X.initial(xMin, yMin);
 	}
 	else if (dim == 2) {
 		X.initial(y);
+		Max_X.initial(yMax);
+		Min_X.initial(yMin);
 	}
 	else if (dim == 1) {
 		X.initial(x);
+		Max_X.initial(xMax);
+		Min_X.initial(xMin);
 	}
+
 	Vector pre_x = X, now_x = X;
 	Matrix G = Gradient(pre_x); // Gradient
 	Vector step;
@@ -912,10 +926,15 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 	int k = 0;
 	while (Max_iter-- > 0) {
 
-		
-
 		// Step
 		Matrix H = Hessian(now_x);	// Hessian
+
+		// Assure Hessian be positive to reach global minium
+		while (Determinant(H) < 0) {
+			now_x = 0.9 * now_x;
+			H = Hessian(now_x);
+		}
+
 		Matrix InvH = Inverse(H);	// Inverse Hessian
 		Matrix S = G * Transpose(InvH);
 		// Not a Number
@@ -928,6 +947,8 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 			S = Gradient(now_x) * Transpose(InvH);
 		}
 		step = S.Data[0];
+		//TEST
+		std::cout << f(pre_x) << std::endl;
 
 		pre_x = now_x;
 		now_x = pre_x - step;
@@ -941,6 +962,13 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 			G = Gradient(now_x);
 		}
 
+		// Edge Dealing
+		for (int i = 0; i < now_x.getDim(); i++) {
+			while (now_x.Data[i] > Max_X.Data[i] || now_x.Data[i] < Min_X.Data[i]) {
+				step = 0.9 * step;
+				now_x = pre_x - step;
+			}
+		}
 
 		// Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
@@ -986,19 +1014,27 @@ void Equation::Newton(double x, double y, System::Windows::Forms::TextBox ^Outpu
 	Output->Text += System::Environment::NewLine + "min = " + f(pre_x).ToString() + System::Environment::NewLine + System::Environment::NewLine;
 }
 
-void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox ^Output)
+void Equation::Quasi_Newton(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox ^Output)
 {
 	double Precision = 0.0001;
 	int Max_iter = 500;
 
+	// Initial X Vector and Internal Vector
+	Vector Max_X, Min_X;
 	if (dim == 3) {
 		X.initial(x, y);
+		Max_X.initial(xMax, yMax);
+		Min_X.initial(xMin, yMin);
 	}
 	else if (dim == 2) {
 		X.initial(y);
+		Max_X.initial(yMax);
+		Min_X.initial(yMin);
 	}
 	else if (dim == 1) {
 		X.initial(x);
+		Max_X.initial(xMax);
+		Min_X.initial(xMin);
 	}
 
 	Vector pre_x = X, now_x = X;
@@ -1026,6 +1062,14 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 		//pre_x = now_x;
 		now_x = pre_x + step;
 
+		// Edge Dealing
+		for (int i = 0; i < now_x.getDim(); i++) {
+			while (now_x.Data[i] > Max_X.Data[i] || now_x.Data[i] < Min_X.Data[i]) {
+				step = 0.9 * step;
+				now_x = pre_x - step;
+			}
+		}
+
 		// Compute Fake Inverse Hessian
 		Matrix Step(step);
 		Matrix now_G = Gradient(now_x);
@@ -1048,7 +1092,9 @@ void Equation::Quasi_Newton(double x, double y, System::Windows::Forms::TextBox 
 		double d2 = 1 / (Yk * Fake_InvH * Transpose(Yk)).Data[0].Data[0];
 
 		Fake_InvH = Fake_InvH + d1 * M1 - d2 * M2;
-		
+
+		// Assure Hessian be positive to reach global minium
+
 		//Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
 			break;

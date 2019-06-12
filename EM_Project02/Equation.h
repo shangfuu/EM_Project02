@@ -26,8 +26,8 @@ public:
 	void Powell(double, double, double, double, double, double, System::Windows::Forms::TextBox^ Output);
 	void Steepest_Descent(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^);
 	void Conjugate(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^);
-	void Newton(double x, double y, System::Windows::Forms::TextBox^);
-	void Quasi_Newton(double x, double y, System::Windows::Forms::TextBox^);
+	void Newton(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^);
+	void Quasi_Newton(double x, double y, double xMin, double xMax, double yMin, double yMax, System::Windows::Forms::TextBox^);
 
 	/* Extra Method */
 	friend std::vector<std::string> postfix(std::string);	// postfix
