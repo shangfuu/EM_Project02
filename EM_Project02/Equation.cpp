@@ -705,17 +705,32 @@ void Equation::Steepest_Descent(double x, double y, double xMin, double xMax, do
 
 		// step 2 : compute step-size lambda
 
-		/*Matrix L1 = G * Transpose(G);
+		Matrix L1 = G * Transpose(G);
 		Matrix H = Hessian(pre_x);
 		Matrix L2 = Inverse(G*H*Transpose(G));
-		Matrix LL = L1 * L2;*/
-		Matrix L = G * Transpose(G) * Inverse(G * Hessian(pre_x) * Transpose(G));
+
+		Matrix L = L1 * L2;
+		//Matrix L = G * Transpose(G) * Inverse(G * Hessian(pre_x) * Transpose(G));
 
 		Vector lambda = L.Data[0];
 		step = lambda * gradient;
 
 		// step 3
 		now_x = pre_x + step;
+
+		while (f(now_x)>f(pre_x)) {
+			Matrix I;
+			I.identity(now_x);
+			H = H + I;
+
+			L2 = Inverse(G*H*Transpose(G));
+			L = L1 * L2;
+			lambda = L.Data[0];
+			step = lambda * gradient;
+
+			// step 3
+			now_x = pre_x + step;
+		}
 
 		// Edge Dealing
 		for (int i = 0; i < now_x.getDim(); i++) {
@@ -920,20 +935,16 @@ void Equation::Newton(double x, double y, double xMin, double xMax, double yMin,
 	}
 
 	Vector pre_x = X, now_x = X;
-	Matrix G = Gradient(pre_x); // Gradient
 	Vector step;
 
 	int k = 0;
 	while (Max_iter-- > 0) {
-
+		
 		// Step
+		Matrix G = Gradient(now_x);	// Gradient
 		Matrix H = Hessian(now_x);	// Hessian
 
 		// Assure Hessian be positive to reach global minium
-		while (Determinant(H) < 0) {
-			now_x = 0.9 * now_x;
-			H = Hessian(now_x);
-		}
 
 		Matrix InvH = Inverse(H);	// Inverse Hessian
 		Matrix S = G * Transpose(InvH);
@@ -942,25 +953,39 @@ void Equation::Newton(double x, double y, double xMin, double xMax, double yMin,
 			step = step * 0.9;
 			now_x = pre_x - step;
 
+			G = Gradient(now_x);
 			H = Hessian(now_x);
 			InvH = Inverse(H);
 			S = Gradient(now_x) * Transpose(InvH);
 		}
 		step = S.Data[0];
-		//TEST
-		std::cout << f(pre_x) << std::endl;
 
 		pre_x = now_x;
 		now_x = pre_x - step;
 
-		G = Gradient(now_x);
-		// Not A Number Happened
-		while (isnan(G.Data[0].Data[0])) {
-			step = 0.9 * step;
-			now_x = pre_x - step;
+		while (f(now_x) > f(pre_x)) {
+			// Assure Hessian be positive to reach global minium
+			Matrix I;
+			I.identity(now_x);
+			H = H + I;
 
-			G = Gradient(now_x);
+			InvH = Inverse(H);	// Inverse Hessian
+			S = G * Transpose(InvH);
+			// Not a Number
+			while (isnan(S.Data[0].Data[0]) || isnan(G.Data[0].Data[0])) {
+				step = step * 0.9;
+				now_x = pre_x - step;
+
+				H = Hessian(now_x);
+				InvH = Inverse(H);
+				S = Gradient(now_x) * Transpose(InvH);
+			}
+			step = S.Data[0];
+
+			
+			now_x = pre_x - step;
 		}
+		
 
 		// Edge Dealing
 		for (int i = 0; i < now_x.getDim(); i++) {
@@ -1056,11 +1081,26 @@ void Equation::Quasi_Newton(double x, double y, double xMin, double xMax, double
 		D = -1 * D;
 
 		// Compute Afa Step (skip)
-		Matrix Afa = -1 * G * Transpose(D) * Inverse(D * Hessian(now_x) * Transpose(D));
+		Matrix Hess = Hessian(now_x);
+		Matrix Afa = -1 * G * Transpose(D) * Inverse(D * Hess * Transpose(D));
 		step = Afa.Data[0] * D.Data[0];
 
 		//pre_x = now_x;
 		now_x = pre_x + step;
+
+		// Assure Hessian
+		while (f(now_x) > f(pre_x)) {
+			Matrix I;
+			I.identity(now_x);
+			Hess = Hess + I;
+
+			// Compute Afa Step (skip)
+			Afa = -1 * G * Transpose(D) * Inverse(D * Hess * Transpose(D));
+			step = Afa.Data[0] * D.Data[0];
+
+			//pre_x = now_x;
+			now_x = pre_x + step;
+		}
 
 		// Edge Dealing
 		for (int i = 0; i < now_x.getDim(); i++) {
@@ -1093,7 +1133,6 @@ void Equation::Quasi_Newton(double x, double y, double xMin, double xMax, double
 
 		Fake_InvH = Fake_InvH + d1 * M1 - d2 * M2;
 
-		// Assure Hessian be positive to reach global minium
 
 		//Stopping Criteria
 		if (abs(Norm(now_x - pre_x)) <= Precision) {
